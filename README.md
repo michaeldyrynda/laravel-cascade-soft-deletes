@@ -51,6 +51,8 @@ $post = App\Post::find($postId)
 $post->delete(); // Soft delete the post, which will also trigger the delete() method on any comments and their children.
 ```
 
+*Note* It's important to know that when you cascade your soft deleted child records, there is no way to know which were deleted by the cascading operation, and which were deleted prior to that. This means that when you restore the blog post, the associated comments will not be.
+
 ## Installation
 
 This trait is installed via [Composer](http://getcomposer.org/). To install, simply add to your `composer.json` file:
