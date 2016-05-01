@@ -1,0 +1,27 @@
+{
+    "name": "iatstuti/laravel-cascade-soft-deletes",
+    "description": "Cascading deletes for Eloquent models that implement soft deletes",
+    "type": "utility",
+    "require": {
+        "php": ">=5.4",
+        "illuminate/database": "~5.0",
+        "illuminate/events": "~5.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^4.8"
+    },
+    "autoload": {
+        "psr-4": {
+            "Iatstuti\\Database\\Support\\": "src/"
+        }
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Michael Dyrynda",
+            "email": "michael@dyrynda.com.au",
+            "homepage": "https://dyrynda.com.au"
+        }
+    ],
+    "minimum-stability": "stable"
+}
