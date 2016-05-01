@@ -35,6 +35,8 @@ class Post extends Model
 
     protected $cascadeDeletes = ['comments'];
 
+	protected $dates = ['deleted_at'];
+
     public function comments()
     {
         return $this->hasMany(Comment::class);
