@@ -75,7 +75,26 @@ class CascadeSoftDeletesIntegrationTest extends PHPUnit_Framework_TestCase
             new Tests\Entities\Comment(['body' => 'This is the third test comment']),
         ]);
 
-        $this->assertCount(3, $post->comments);
+        $post->delete();
+    }
+
+    /**
+     * @test
+     * @expectedException \RuntimeException
+     */
+    public function it_takes_exception_to_models_trying_to_cascade_deletes_on_invalid_relationships()
+    {
+        $post = Tests\Entities\InvalidRelationshipPost::create([
+            'title' => 'Testing invalid cascade relationships',
+            'body'  => 'Ensure you can only use this trait if the model defines valid relationships',
+        ]);
+
+        $post->comments()->saveMany([
+            new Tests\Entities\Comment(['body' => 'This is the first test comment']),
+            new Tests\Entities\Comment(['body' => 'This is the second test comment']),
+            new Tests\Entities\Comment(['body' => 'This is the third test comment']),
+        ]);
+
         $post->delete();
     }
 }
