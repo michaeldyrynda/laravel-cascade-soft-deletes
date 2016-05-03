@@ -35,4 +35,8 @@ before_install:
 
 install: composer update --prefer-source --no-interaction --dev -v
 
-script: vendor/bin/phpunit --debug -c phpunit.xml
+script: vendor/bin/phpunit --debug -c phpunit.xml --coverage-clover=coverage.clover
+
+after_script:
+    - wget https://scrutinizer-ci.com/ocular.phar
+    - php ocular.phar code-coverage:upload --format=php-clover coverage.clover
