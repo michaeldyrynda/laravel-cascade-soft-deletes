@@ -3,6 +3,7 @@
 
 ![Travis Build Status](https://travis-ci.org/michaeldyrynda/laravel-cascade-soft-deletes.svg?branch=master)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/michaeldyrynda/laravel-cascade-soft-deletes/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/michaeldyrynda/laravel-cascade-soft-deletes/?branch=master)
+[![Code Coverage](https://scrutinizer-ci.com/g/michaeldyrynda/laravel-cascade-soft-deletes/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/michaeldyrynda/laravel-cascade-soft-deletes/?branch=master)
 [![Latest Stable Version](https://poser.pugx.org/iatstuti/laravel-cascade-soft-deletes/v/stable)](https://packagist.org/packages/iatstuti/laravel-cascade-soft-deletes)
 [![Total Downloads](https://poser.pugx.org/iatstuti/laravel-cascade-soft-deletes/downloads)](https://packagist.org/packages/iatstuti/laravel-cascade-soft-deletes)
 [![License](https://poser.pugx.org/iatstuti/laravel-cascade-soft-deletes/license)](https://packagist.org/packages/iatstuti/laravel-cascade-soft-deletes)
@@ -52,6 +53,8 @@ $post->delete(); // Soft delete the post, which will also trigger the delete() m
 ```
 
 **Note**: It's important to know that when you cascade your soft deleted child records, there is no way to know which were deleted by the cascading operation, and which were deleted prior to that. This means that when you restore the blog post, the associated comments will not be.
+
+Because this trait hooks into the `deleting` Eloquent model event, we can prevent the parent record from being deleted as well as any child records, if any exception is triggered. A `LogicException` will be triggered if the model does not use the `Illuminate\Database\Eloquent\SoftDeletes` trait, or if any of the defined `cascadeDeletes` relationships do not return an instance of `Illuminate\Database\Eloquent\Relations\Relation`.
 
 ## Installation
 
