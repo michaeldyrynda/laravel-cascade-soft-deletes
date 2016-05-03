@@ -28,9 +28,8 @@ trait CascadeSoftDeletes
             foreach ($model->cascadeDeletes as $relationship) {
                 if (! $model->{$relationship}() instanceof Relation) {
                     throw new LogicException(sprintf(
-                        'Relationship [%s] must return an object of type %s',
-                        $relationship,
-                        Relation::class
+                        'Relationship [%s] must return an object of type Illuminate\Database\Eloquent\SoftDeletes',
+                        $relationship
                     ));
                 }
 
@@ -40,9 +39,14 @@ trait CascadeSoftDeletes
     }
 
 
+    /**
+     * Determine if the current model implements soft deletes.
+     *
+     * @return bool
+     */
     protected function implementsSoftDeletes()
     {
-        return in_array(SoftDeletes::class, class_uses($this));
+        return in_array('Illuminate\Database\Eloquent\SoftDeletes', class_uses($this));
     }
 
 }
