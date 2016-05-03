@@ -4,7 +4,6 @@ namespace Tests\Entities;
 
 use Iatstuti\Database\Support\CascadeSoftDeletes;
 use Illuminate\Database\Eloquent\Model;
-use Tests\Entities\Comment;
 
 class NonSoftDeletingPost extends Model
 {
@@ -16,6 +15,6 @@ class NonSoftDeletingPost extends Model
 
     public function comments()
     {
-        return $this->hasMany(Comment::class);
+        return $this->hasMany('Tests\Entities\Comment');
     }
 }

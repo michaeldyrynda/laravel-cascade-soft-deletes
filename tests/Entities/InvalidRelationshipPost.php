@@ -5,7 +5,6 @@ namespace Tests\Entities;
 use Iatstuti\Database\Support\CascadeSoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Tests\Entities\Comment;
 
 class InvalidRelationshipPost extends Model
 {
@@ -17,7 +16,7 @@ class InvalidRelationshipPost extends Model
 
     public function comments()
     {
-        return $this->hasMany(Comment::class);
+        return $this->hasMany('Tests\Entities\Comment');
     }
 
     public function invalidRelationship()
