@@ -2,8 +2,8 @@
 
 namespace Iatstuti\Database\Support;
 
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use LogicException;
 
 trait CascadeSoftDeletes
 {
@@ -19,20 +19,21 @@ trait CascadeSoftDeletes
     {
         static::deleting(function ($model) {
             if (! $model->implementsSoftDeletes()) {
-                throw new RuntimeException(sprintf(
+                throw new LogicException(sprintf(
                     '%s does not implement Illuminate\Database\Eloquent\SoftDeletes',
                     get_called_class()
                 ));
             }
 
-            foreach ($model->cascadeDeletes as $relationship) {
-                if (! $model->{$relationship}() instanceof Relation) {
-                    throw new LogicException(sprintf(
-                        'Relationship [%s] must return an object of type Illuminate\Database\Eloquent\SoftDeletes',
-                        $relationship
-                    ));
-                }
+            if ($invalidCascadingRelationships = $model->hasInvalidCascadingRelationships()) {
+                throw new LogicException(sprintf(
+                    '%s [%s] must return an object of type Illuminate\Database\Eloquent\Relations\Relation',
+                    str_plural('Relationship', count($invalidCascadingRelationships)),
+                    join(', ', $invalidCascadingRelationships)
+                ));
+            }
 
+            foreach ($model->cascadeDeletes as $relationship) {
                 $model->{$relationship}()->delete();
             }
         });
@@ -49,4 +50,16 @@ trait CascadeSoftDeletes
         return in_array('Illuminate\Database\Eloquent\SoftDeletes', class_uses($this));
     }
 
+
+    /**
+     * Determine if the current model has any invalid cascading relationships defined.
+     *
+     * @return array
+     */
+    protected function hasInvalidCascadingRelationships()
+    {
+        return collect($this->cascadeDeletes)->filter(function ($relationship) {
+            return ! $this->{$relationship}() instanceof Relation;
+        })->toArray();
+    }
 }
