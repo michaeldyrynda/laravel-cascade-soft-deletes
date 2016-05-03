@@ -60,7 +60,7 @@ class CascadeSoftDeletesIntegrationTest extends PHPUnit_Framework_TestCase
 
     /**
      * @test
-     * @expectedException \RuntimeException
+     * @expectedException \LogicException
      */
     public function it_takes_excepion_to_models_that_do_not_implement_soft_deletes()
     {
@@ -80,7 +80,7 @@ class CascadeSoftDeletesIntegrationTest extends PHPUnit_Framework_TestCase
 
     /**
      * @test
-     * @expectedException \RuntimeException
+     * @expectedException \LogicException
      */
     public function it_takes_exception_to_models_trying_to_cascade_deletes_on_invalid_relationships()
     {
@@ -96,5 +96,27 @@ class CascadeSoftDeletesIntegrationTest extends PHPUnit_Framework_TestCase
         ]);
 
         $post->delete();
+    }
+
+    /** @test */
+    public function it_ensures_that_no_deletes_are_performed_if_there_are_invalid_relationships()
+    {
+        $post = Tests\Entities\InvalidRelationshipPost::create([
+            'title' => 'Testing deletes are not executed',
+            'body'  => 'If an invalid relationship is encountered, no deletes should be perofrmed',
+        ]);
+
+        $post->comments()->saveMany([
+            new Tests\Entities\Comment(['body' => 'This is the first test comment']),
+            new Tests\Entities\Comment(['body' => 'This is the second test comment']),
+            new Tests\Entities\Comment(['body' => 'This is the third test comment']),
+        ]);
+
+        try {
+            $post->delete();
+        } catch (\LogicException $e) {
+            $this->assertNotNull(Tests\Entities\InvalidRelationshipPost::find($post->id));
+            $this->assertCount(3, Tests\Entities\Comment::where('post_id', $post->id)->get());
+        }
     }
 }

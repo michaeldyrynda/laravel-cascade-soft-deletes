@@ -9,12 +9,14 @@ class NonSoftDeletingPost extends Model
 {
     use CascadeSoftDeletes;
 
+    protected $table = 'posts';
+
     protected $cascadeDeletes = ['comments'];
 
     protected $fillable = ['title', 'body'];
 
     public function comments()
     {
-        return $this->hasMany('Tests\Entities\Comment');
+        return $this->hasMany('Tests\Entities\Comment', 'post_id');
     }
 }
