@@ -1,0 +1,38 @@
+language: php
+
+php:
+    - '5.4'
+    - '5.5.9'
+    - '5.6'
+    - '7.0'
+    - 'nightly'
+
+env:
+    - ILLUMINATE_VERSION=5.0.*
+
+matrix:
+    include:
+        - php: 5.5.9
+          env: ILLUMINATE_VERSION=5.1.*
+        - php: 5.5.9
+          env: ILLUMINATE_VERSION=5.2.*
+        - php: 5.6
+          env: ILLUMINATE_VERSION=5.1.*
+        - php: 5.6
+          env: ILLUMINATE_VERSION=5.2.*
+        - php: 7.0
+          env: ILLUMINATE_VERSION=5.1.*
+        - php: 7.0
+          env: ILLUMINATE_VERSION=5.2.*
+        - php: nightly
+          env: ILLUMINATE_VERSION=5.1.*
+        - php: nightly
+          env: ILLUMINATE_VERSION=5.2.*
+
+before_install:
+    - composer require "illuminate/database:${ILLUMINATE_VERSION}" --no-update -v
+    - composer require "illuminate/events:${ILLUMINATE_VERSION}" --no-update -v
+
+install: composer update --prefer-source --no-interaction --dev -v
+
+script: vendor/bin/phpunit --debug -c phpunit.xml
