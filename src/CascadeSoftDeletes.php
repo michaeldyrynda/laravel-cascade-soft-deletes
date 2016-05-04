@@ -13,7 +13,7 @@ trait CascadeSoftDeletes
      * Listen for the deleting event of a soft deleting model, and run
      * the delete operation for any configured relationship methods.
      *
-     * @throws \RuntimeException
+     * @throws \LogicException
      */
     protected static function bootCascadeSoftDeletes()
     {
@@ -27,13 +27,13 @@ trait CascadeSoftDeletes
 
             if ($invalidCascadingRelationships = $model->hasInvalidCascadingRelationships()) {
                 throw new LogicException(sprintf(
-                    '%s [%s] must return an object of type Illuminate\Database\Eloquent\Relations\Relation',
+                    '%s [%s] must exist and return an object of type Illuminate\Database\Eloquent\Relations\Relation',
                     str_plural('Relationship', count($invalidCascadingRelationships)),
                     join(', ', $invalidCascadingRelationships)
                 ));
             }
 
-            foreach ($model->cascadeDeletes as $relationship) {
+            foreach ($model->getCascadingDeletes() as $relationship) {
                 $model->{$relationship}()->delete();
             }
         });
@@ -54,12 +54,26 @@ trait CascadeSoftDeletes
     /**
      * Determine if the current model has any invalid cascading relationships defined.
      *
+     * A relationship is considered invalid when the method does not exist, or the relationship
+     * method does not return an instance of Illuminate\Database\Eloquent\Relations\Relation.
+     *
      * @return array
      */
     protected function hasInvalidCascadingRelationships()
     {
-        return collect($this->cascadeDeletes)->filter(function ($relationship) {
-            return ! $this->{$relationship}() instanceof Relation;
-        })->toArray();
+        return array_filter($this->getCascadingDeletes(), function ($relationship) {
+            return ! method_exists($this, $relationship) || ! $this->{$relationship}() instanceof Relation;
+        });
+    }
+
+
+    /**
+     * Fetch the defined cascading soft deletes for this model.
+     *
+     * @return array
+     */
+    protected function getCascadingDeletes()
+    {
+        return isset($this->cascadeDeletes) ? (array) $this->cascadeDeletes : [];
     }
 }
