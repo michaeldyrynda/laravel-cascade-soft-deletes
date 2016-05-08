@@ -74,6 +74,6 @@ trait CascadeSoftDeletes
      */
     protected function getCascadingDeletes()
     {
-        return isset($this->cascadeDeletes) ? (array) $this->cascadeDeletes : [];
+        return object_get($this, 'cascadeDeletes', []);
     }
 }
