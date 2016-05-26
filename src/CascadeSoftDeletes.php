@@ -47,7 +47,27 @@ trait CascadeSoftDeletes
      */
     protected function implementsSoftDeletes()
     {
-        return in_array('Illuminate\Database\Eloquent\SoftDeletes', class_uses($this));
+        return in_array('Illuminate\Database\Eloquent\SoftDeletes', $this->getClassTraits($this));
+    }
+    
+
+    /**
+     * Get all traits used by class, including those inherited from ancestor classes.
+     *
+     * @param      $class
+     * @param bool $autoload
+     *
+     * @return array
+     */
+    protected function getClassTraits($class, $autoload = true) {
+        $traits = [];
+        do {
+            $traits = array_merge(class_uses($class, $autoload), $traits);
+        } while($class = get_parent_class($class));
+        foreach ($traits as $trait => $same) {
+            $traits = array_merge(class_uses($trait, $autoload), $traits);
+        }
+        return array_unique($traits);
     }
 
 
