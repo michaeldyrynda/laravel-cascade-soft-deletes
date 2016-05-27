@@ -12,6 +12,6 @@ class ChildPost extends Post
 
     public function comments()
     {
-        return $this->hasMany(Comment::class, 'post_id');
+        return $this->hasMany('Tests\Entities\Comment', 'post_id');
     }
 }
