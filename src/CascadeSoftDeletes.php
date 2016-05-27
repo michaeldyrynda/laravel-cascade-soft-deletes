@@ -47,7 +47,7 @@ trait CascadeSoftDeletes
      */
     protected function implementsSoftDeletes()
     {
-        return in_array('Illuminate\Database\Eloquent\SoftDeletes', class_uses($this));
+        return method_exists($this, 'runSoftDelete');
     }
 
 

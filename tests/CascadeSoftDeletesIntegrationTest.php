@@ -137,6 +137,23 @@ class CascadeSoftDeletesIntegrationTest extends PHPUnit_Framework_TestCase
         $post->delete();
     }
 
+    /** @test */
+    public function it_handles_soft_deletes_inherited_from_a_parent_model()
+    {
+        $post = Tests\Entities\ChildPost::create([
+            'title' => 'Testing child model inheriting model trait',
+            'body'  => 'This should allow a child class to inherit the soft deletes trait',
+        ]);
+
+        $this->attachCommentsToPost($post);
+
+        $post->delete();
+
+        $this->assertNull(Tests\Entities\ChildPost::find($post->id));
+        $this->assertCount(1, Tests\Entities\ChildPost::withTrashed()->where('id', $post->id)->get());
+        $this->assertCount(0, Tests\Entities\Comment::where('post_id', $post->id)->get());
+    }
+
     /**
      * Attach some dummy comments to the given post.
      *
