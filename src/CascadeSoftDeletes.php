@@ -34,7 +34,7 @@ trait CascadeSoftDeletes
             }
 
             foreach ($model->getCascadingDeletes() as $relationship) {
-                $model->{$relationship}()->delete();
+                $model->forceDeleting ? $model->{$relationship}()->forceDelete() : $model->{$relationship}()->delete();
             }
         });
     }
