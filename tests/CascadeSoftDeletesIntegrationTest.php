@@ -53,6 +53,22 @@ class CascadeSoftDeletesIntegrationTest extends PHPUnit_Framework_TestCase
         $this->assertCount(0, Tests\Entities\Comment::where('post_id', $post->id)->get());
     }
 
+    /** @test */
+    public function it_cascades_deletes_when_force_deleting_a_parent_model()
+    {
+        $post = Tests\Entities\Post::create([
+            'title' => 'How to cascade soft deletes in Laravel',
+            'body'  => 'This is how you cascade soft deletes in Laravel',
+        ]);
+
+        $this->attachCommentsToPost($post);
+
+        $this->assertCount(3, $post->comments);
+        $post->forceDelete();
+        $this->assertCount(0, Tests\Entities\Comment::where('post_id', $post->id)->get());
+        $this->assertCount(0, Tests\Entities\Post::withTrashed()->where('id', $post->id)->get());
+    }
+
     /**
      * @test
      * @expectedException              \LogicException
