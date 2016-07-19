@@ -33,8 +33,12 @@ trait CascadeSoftDeletes
                 ));
             }
 
+            $delete = $model->forceDeleting ? 'forceDelete' : 'delete';
+
             foreach ($model->getCascadingDeletes() as $relationship) {
-                $model->forceDeleting ? $model->{$relationship}()->forceDelete() : $model->{$relationship}()->delete();
+                foreach ($model->{$relationship} as $child) {
+                    $child->{$delete}();
+                }
             }
         });
     }
