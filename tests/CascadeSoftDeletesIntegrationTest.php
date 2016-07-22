@@ -21,8 +21,16 @@ class CascadeSoftDeletesIntegrationTest extends PHPUnit_Framework_TestCase
         $manager->setAsGlobal();
         $manager->bootEloquent();
 
+        $manager->schema()->create('authors', function ($table) {
+            $table->increments('id');
+            $table->string('name');
+            $table->timestamps();
+            $table->softDeletes();
+        });
+
         $manager->schema()->create('posts', function ($table) {
             $table->increments('id');
+            $table->integer('author_id')->unsigned()->nullable();
             $table->string('title');
             $table->string('body');
             $table->timestamps();
@@ -170,6 +178,54 @@ class CascadeSoftDeletesIntegrationTest extends PHPUnit_Framework_TestCase
         $this->assertCount(0, Tests\Entities\Comment::where('post_id', $post->id)->get());
     }
 
+    /** @test */
+    public function it_handles_grandchildren()
+    {
+        $author = Tests\Entities\Author::create([
+            'name' => 'Testing grandchildren are deleted',
+        ]);
+
+        $this->attachPostsAndCommentsToAuthor($author);
+
+        $author->delete();
+
+        $this->assertNull(Tests\Entities\Author::find($author->id));
+        $this->assertCount(1, Tests\Entities\Author::withTrashed()->where('id', $author->id)->get());
+        $this->assertCount(0, Tests\Entities\Post::where('author_id', $author->id)->get());
+
+        $deletedPosts = Tests\Entities\Post::withTrashed()->where('author_id', $author->id)->get();
+        $this->assertCount(2, $deletedPosts);
+
+        foreach ($deletedPosts as $deletedPost) {
+            $this->assertCount(0, Tests\Entities\Comment::where('post_id', $deletedPost->id)->get());
+        }
+    }
+
+    /**
+     * Attach some dummy posts (w/ comments) to the given author.
+     *
+     * @return void
+     */
+    private function attachPostsAndCommentsToAuthor($author)
+    {
+        $author->posts()->saveMany([
+            $this->attachCommentsToPost(
+                Tests\Entities\Post::create([
+                    'title' => 'First post',
+                    'body'  => 'This is the first test post',
+                ])
+            ),
+            $this->attachCommentsToPost(
+                Tests\Entities\Post::create([
+                    'title' => 'Second post',
+                    'body'  => 'This is the second test post',
+                ])
+            ),
+        ]);
+
+        return $author;
+    }
+
     /**
      * Attach some dummy comments to the given post.
      *
@@ -182,6 +238,8 @@ class CascadeSoftDeletesIntegrationTest extends PHPUnit_Framework_TestCase
             new Tests\Entities\Comment(['body' => 'This is the second test comment']),
             new Tests\Entities\Comment(['body' => 'This is the third test comment']),
         ]);
+
+        return $post;
     }
 
 }
