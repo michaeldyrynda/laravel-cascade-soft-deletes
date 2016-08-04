@@ -12,12 +12,17 @@ class Post extends Model
 
     public $dates = ['deleted_at'];
 
-    protected $cascadeDeletes = ['comments'];
+    protected $cascadeDeletes = ['comments', 'postType'];
 
     protected $fillable = ['title', 'body'];
 
     public function comments()
     {
         return $this->hasMany('Tests\Entities\Comment');
+    }
+
+    public function postType()
+    {
+        return $this->hasOne('Tests\Entities\PostType');
     }
 }

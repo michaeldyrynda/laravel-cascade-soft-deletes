@@ -1,10 +1,10 @@
 <?php
 
-use Illuminate\Database\Capsule\Manager;
-use Illuminate\Events\Dispatcher;
 use Illuminate\Container\Container;
+use Illuminate\Database\Capsule\Manager;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Events\Dispatcher;
 
 class CascadeSoftDeletesIntegrationTest extends PHPUnit_Framework_TestCase
 {
@@ -12,7 +12,7 @@ class CascadeSoftDeletesIntegrationTest extends PHPUnit_Framework_TestCase
     {
         $manager = new Manager();
         $manager->addConnection([
-            'driver' => 'sqlite',
+            'driver'   => 'sqlite',
             'database' => ':memory:',
         ]);
 
@@ -41,6 +41,13 @@ class CascadeSoftDeletesIntegrationTest extends PHPUnit_Framework_TestCase
             $table->increments('id');
             $table->integer('post_id')->unsigned();
             $table->string('body');
+            $table->timestamps();
+        });
+
+        $manager->schema()->create('post_types', function ($table) {
+            $table->increments('id');
+            $table->integer('post_id')->unsigned()->nullable();
+            $table->string('label');
             $table->timestamps();
         });
     }
@@ -201,6 +208,22 @@ class CascadeSoftDeletesIntegrationTest extends PHPUnit_Framework_TestCase
         }
     }
 
+    /** @test */
+    public function it_cascades_a_has_one_relationship()
+    {
+        $post = Tests\Entities\Post::create([
+            'title' => 'Cascae a has one relationship',
+            'body'  => 'This is how you cascade a has one relationship',
+        ]);
+
+        $type = new Tests\Entities\PostType(['label' => 'Test']);
+
+        $post->postType()->save($type);
+
+        $post->delete();
+        $this->assertCount(0, Tests\Entities\Author::withTrashed()->where('id', $type->id)->get());
+    }
+
     /**
      * Attach some dummy posts (w/ comments) to the given author.
      *
@@ -241,5 +264,4 @@ class CascadeSoftDeletesIntegrationTest extends PHPUnit_Framework_TestCase
 
         return $post;
     }
-
 }
