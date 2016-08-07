@@ -92,7 +92,7 @@ trait CascadeSoftDeletes
      *
      * @return array
      */
-    private function getActiveCascadingDeletes()
+    protected function getActiveCascadingDeletes()
     {
         return array_filter($this->getCascadingDeletes(), function ($relationship) {
             return ! is_null($this->{$relationship});
