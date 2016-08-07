@@ -2,6 +2,7 @@
 
 namespace Iatstuti\Database\Support;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use LogicException;
 
@@ -35,9 +36,13 @@ trait CascadeSoftDeletes
 
             $delete = $model->forceDeleting ? 'forceDelete' : 'delete';
 
-            foreach ($model->getCascadingDeletes() as $relationship) {
-                foreach ($model->{$relationship} as $child) {
-                    $child->{$delete}();
+            foreach ($model->getActiveCascadingDeletes() as $relationship) {
+                if ($model->{$relationship} instanceof Model) {
+                    $model->{$relationship}->{$delete}();
+                } else {
+                    foreach ($model->{$relationship} as $child) {
+                        $child->{$delete}();
+                    }
                 }
             }
         });
@@ -79,5 +84,18 @@ trait CascadeSoftDeletes
     protected function getCascadingDeletes()
     {
         return isset($this->cascadeDeletes) ? (array) $this->cascadeDeletes : [];
+    }
+
+
+    /**
+     * For the cascading deletes defined on the model, return only those that are not null.
+     *
+     * @return array
+     */
+    private function getActiveCascadingDeletes()
+    {
+        return array_filter($this->getCascadingDeletes(), function ($relationship) {
+            return ! is_null($this->{$relationship});
+        });
     }
 }

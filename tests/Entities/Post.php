@@ -23,6 +23,6 @@ class Post extends Model
 
     public function postType()
     {
-        return $this->hasOne('Tests\Entities\PostType');
+        return $this->hasOne('Tests\Entities\PostType', 'post_id');
     }
 }

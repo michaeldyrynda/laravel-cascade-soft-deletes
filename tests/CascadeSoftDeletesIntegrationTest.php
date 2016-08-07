@@ -212,7 +212,7 @@ class CascadeSoftDeletesIntegrationTest extends PHPUnit_Framework_TestCase
     public function it_cascades_a_has_one_relationship()
     {
         $post = Tests\Entities\Post::create([
-            'title' => 'Cascae a has one relationship',
+            'title' => 'Cascade a has one relationship',
             'body'  => 'This is how you cascade a has one relationship',
         ]);
 
@@ -221,7 +221,7 @@ class CascadeSoftDeletesIntegrationTest extends PHPUnit_Framework_TestCase
         $post->postType()->save($type);
 
         $post->delete();
-        $this->assertCount(0, Tests\Entities\Author::withTrashed()->where('id', $type->id)->get());
+        $this->assertCount(0, Tests\Entities\PostType::where('id', $type->id)->get());
     }
 
     /**
