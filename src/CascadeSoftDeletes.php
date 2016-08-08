@@ -41,7 +41,12 @@ trait CascadeSoftDeletes
                     $model->{$relationship}->{$delete}();
                 } else {
                     foreach ($model->{$relationship} as $child) {
-                        $child->{$delete}();
+                        if ($child->pivot){
+                            $child->pivot->delete();
+                        }
+                        else{
+                            $child->{$delete}();
+                        }
                     }
                 }
             }
