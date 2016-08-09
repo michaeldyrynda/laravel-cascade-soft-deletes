@@ -50,6 +50,21 @@ class CascadeSoftDeletesIntegrationTest extends PHPUnit_Framework_TestCase
             $table->string('label');
             $table->timestamps();
         });
+
+        /** Many2Many (Authors <=> Posts Types) pivot table **/
+
+        $manager->schema()->create('authors__post_types', function ($table) {
+
+            $table->increments('id');
+            $table->integer('author_id');
+            $table->integer('posttype_id');
+
+            $table->timestamps();
+            $table->softDeletes();
+
+            $table->foreign('author_id')->references('id')->on('author');
+            $table->foreign('posttype_id')->references('id')->on('post_types');
+        });
     }
 
 
@@ -66,6 +81,26 @@ class CascadeSoftDeletesIntegrationTest extends PHPUnit_Framework_TestCase
         $this->assertCount(3, $post->comments);
         $post->delete();
         $this->assertCount(0, Tests\Entities\Comment::where('post_id', $post->id)->get());
+    }
+
+    /* Many2Many with pivot table(deletes entries in pivot) */
+    public function it_cascades_deletes_entries_from_pivot_table()
+    {
+        $author = Tests\Entities\Author::create(['name' => 'ManyToManyTestAuthor']);
+
+        $this->attachPostTypesToAuthor($author);
+        $this->assertCount(2, $author->posttypes);
+
+        $author->delete();
+
+        $manager = Manager::$instance;
+
+        $pivotCount = $manager->table('authors__post_types')
+                                ->where('author_id', $author->id)
+                                ->get()
+                                ->count();
+
+        $this->assertCount(0, $pivotCount);
     }
 
     /** @test */
@@ -222,6 +257,26 @@ class CascadeSoftDeletesIntegrationTest extends PHPUnit_Framework_TestCase
 
         $post->delete();
         $this->assertCount(0, Tests\Entities\PostType::where('id', $type->id)->get());
+    }
+
+    /**
+     * Attach some post types to the given author.
+     *
+     * @return void
+     */
+
+    public function attachPostTypesToAuthor($author)
+    {
+        $author->posttypes()->saveMany([
+
+            Tests\Entities\PostType::create([
+                'label' => 'First Post Type',
+            ]),
+
+            Tests\Entities\PostType::create([
+                'label' => 'Second Post Type',
+            ])
+        ]);
     }
 
     /**

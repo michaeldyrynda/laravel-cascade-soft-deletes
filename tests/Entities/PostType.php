@@ -12,4 +12,9 @@ class PostType extends Model
     {
         return $this->belongsTo('Test\Entities\Post');
     }
+
+    public function authors()
+    {
+        return $this->belongsToMany('Tests\Entities\Author', 'authors__post_types', 'posttype_id', 'author_id');
+    }
 }
