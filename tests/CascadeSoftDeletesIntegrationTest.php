@@ -89,11 +89,11 @@ class CascadeSoftDeletesIntegrationTest extends PHPUnit_Framework_TestCase
 
         $author->delete();
 
-        $pivotEntries = $author->withThrashed()->posttypes;
+        $pivotEntries = Manager::table('authors__post_types')
+                                ->where('author_id', $author->id)
+                              ->get();
 
         $this->assertCount(0, $pivotEntries);
-
-        $author->forceDelete();
     }
 
     /** @test */
