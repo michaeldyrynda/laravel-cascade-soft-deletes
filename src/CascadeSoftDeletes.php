@@ -3,6 +3,7 @@
 namespace Iatstuti\Database\Support;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use LogicException;
 
@@ -40,11 +41,10 @@ trait CascadeSoftDeletes
                 if ($model->{$relationship} instanceof Model) {
                     $model->{$relationship}->{$delete}();
                 } else {
-                    foreach ($model->{$relationship} as $child) {
-                        if ($child->pivot){
-                            $child->pivot->delete();
-                        }
-                        else{
+                    if ($model->{$relationship}() instanceof BelongsToMany) {
+                        $model->{$relationship}()->detach();
+                    } else {
+                        foreach ($model->{$relationship} as $child) {
                             $child->{$delete}();
                         }
                     }

@@ -51,16 +51,12 @@ class CascadeSoftDeletesIntegrationTest extends PHPUnit_Framework_TestCase
             $table->timestamps();
         });
 
-        /** Many2Many (Authors <=> Posts Types) pivot table **/
-
         $manager->schema()->create('authors__post_types', function ($table) {
 
             $table->increments('id');
             $table->integer('author_id');
             $table->integer('posttype_id');
-
             $table->timestamps();
-            $table->softDeletes();
 
             $table->foreign('author_id')->references('id')->on('author');
             $table->foreign('posttype_id')->references('id')->on('post_types');
@@ -83,7 +79,7 @@ class CascadeSoftDeletesIntegrationTest extends PHPUnit_Framework_TestCase
         $this->assertCount(0, Tests\Entities\Comment::where('post_id', $post->id)->get());
     }
 
-    /* Many2Many with pivot table(deletes entries in pivot) */
+    /** @test */
     public function it_cascades_deletes_entries_from_pivot_table()
     {
         $author = Tests\Entities\Author::create(['name' => 'ManyToManyTestAuthor']);
@@ -93,13 +89,11 @@ class CascadeSoftDeletesIntegrationTest extends PHPUnit_Framework_TestCase
 
         $author->delete();
 
-        $manager = Manager::$instance;
-
-        $pivotEntries = $manager->table('authors__post_types')
-                                ->where('author_id', $author->id)
-                              ->get();
+        $pivotEntries = $author->withThrashed()->posttypes;
 
         $this->assertCount(0, $pivotEntries);
+
+        $author->forceDelete();
     }
 
     /** @test */
@@ -263,7 +257,6 @@ class CascadeSoftDeletesIntegrationTest extends PHPUnit_Framework_TestCase
      *
      * @return void
      */
-
     public function attachPostTypesToAuthor($author)
     {
         $author->posttypes()->saveMany([
