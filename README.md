@@ -1,5 +1,5 @@
 # Cascading soft deletes for the Laravel PHP Framework
-## v1.0.5
+## v1.1.0
 
 ![Travis Build Status](https://travis-ci.org/michaeldyrynda/laravel-cascade-soft-deletes.svg?branch=master)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/michaeldyrynda/laravel-cascade-soft-deletes/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/michaeldyrynda/laravel-cascade-soft-deletes/?branch=master)
@@ -23,6 +23,8 @@ As of `v1.0.2`, you can inherit `CascadeSoftDeletes` from a base model class, yo
 As of `v1.0.4`, the package supports cascading deletes of grandchildren records ([#8](https://github.com/michaeldyrynda/laravel-cascade-soft-deletes/issues/8), [#9](https://github.com/michaeldyrynda/laravel-cascade-soft-deletes/pull/9)).
 
 As of `v1.0.5`, the package has better support of `hasOne` relationships ([#10](https://github.com/michaeldyrynda/laravel-cascade-soft-deletes/issues/10), [#11](https://github.com/michaeldyrynda/laravel-cascade-soft-deletes/issues/11)).
+
+`v1.1.0` adds compatibility with Laravel 5.3.
 
 ## Code Samples
 
