@@ -5,7 +5,6 @@ namespace Iatstuti\Database\Support;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use LogicException;
 
 trait CascadeSoftDeletes
 {
@@ -21,18 +20,11 @@ trait CascadeSoftDeletes
     {
         static::deleting(function ($model) {
             if (! $model->implementsSoftDeletes()) {
-                throw new LogicException(sprintf(
-                    '%s does not implement Illuminate\Database\Eloquent\SoftDeletes',
-                    get_called_class()
-                ));
+                throw CascadeSoftDeleteException::softDeleteNotImplemented(get_called_class());
             }
 
             if ($invalidCascadingRelationships = $model->hasInvalidCascadingRelationships()) {
-                throw new LogicException(sprintf(
-                    '%s [%s] must exist and return an object of type Illuminate\Database\Eloquent\Relations\Relation',
-                    str_plural('Relationship', count($invalidCascadingRelationships)),
-                    join(', ', $invalidCascadingRelationships)
-                ));
+                throw CascadeSoftDeleteException::invalidRelationships($invalidCascadingRelationships);
             }
 
             $delete = $model->forceDeleting ? 'forceDelete' : 'delete';

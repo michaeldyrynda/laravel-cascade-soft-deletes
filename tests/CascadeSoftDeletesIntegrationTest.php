@@ -1,5 +1,6 @@
 <?php
 
+use Iatstuti\Database\Support\CascadeSoftDeleteException;
 use Illuminate\Container\Container;
 use Illuminate\Database\Capsule\Manager;
 use Illuminate\Database\Eloquent\Model;
@@ -114,7 +115,7 @@ class CascadeSoftDeletesIntegrationTest extends PHPUnit_Framework_TestCase
 
     /**
      * @test
-     * @expectedException              \LogicException
+     * @expectedException              \Iatstuti\Database\Support\CascadeSoftDeleteException
      * @expectedExceptionMessageRegExp /.* does not implement Illuminate\\Database\\Eloquent\\SoftDeletes/
      */
     public function it_takes_excepion_to_models_that_do_not_implement_soft_deletes()
@@ -131,7 +132,7 @@ class CascadeSoftDeletesIntegrationTest extends PHPUnit_Framework_TestCase
 
     /**
      * @test
-     * @expectedException              \LogicException
+     * @expectedException              \Iatstuti\Database\Support\CascadeSoftDeleteException
      * @expectedExceptionMessageRegExp /.* \[.*\] must exist and return an object of type Illuminate\\Database\\Eloquent\\Relations\\Relation/
      */
     public function it_takes_exception_to_models_trying_to_cascade_deletes_on_invalid_relationships()
@@ -158,7 +159,7 @@ class CascadeSoftDeletesIntegrationTest extends PHPUnit_Framework_TestCase
 
         try {
             $post->delete();
-        } catch (\LogicException $e) {
+        } catch (CascadeSoftDeleteException $e) {
             $this->assertNotNull(Tests\Entities\InvalidRelationshipPost::find($post->id));
             $this->assertCount(3, Tests\Entities\Comment::where('post_id', $post->id)->get());
         }
@@ -183,7 +184,7 @@ class CascadeSoftDeletesIntegrationTest extends PHPUnit_Framework_TestCase
 
     /**
      * @test
-     * @expectedException              \LogicException
+     * @expectedException              \Iatstuti\Database\Support\CascadeSoftDeleteException
      * @expectedExceptionMessageRegExp /Relationship \[.*\] must exist and return an object of type Illuminate\\Database\\Eloquent\\Relations\\Relation/
      */
     public function it_handles_situations_where_the_relationship_method_does_not_exist()
@@ -267,7 +268,7 @@ class CascadeSoftDeletesIntegrationTest extends PHPUnit_Framework_TestCase
 
             Tests\Entities\PostType::create([
                 'label' => 'Second Post Type',
-            ])
+            ]),
         ]);
     }
 
