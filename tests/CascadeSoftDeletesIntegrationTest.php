@@ -92,7 +92,7 @@ class CascadeSoftDeletesIntegrationTest extends PHPUnit_Framework_TestCase
 
         $pivotEntries = Manager::table('authors__post_types')
                                 ->where('author_id', $author->id)
-                              ->get();
+                                ->get();
 
         $this->assertCount(0, $pivotEntries);
     }
