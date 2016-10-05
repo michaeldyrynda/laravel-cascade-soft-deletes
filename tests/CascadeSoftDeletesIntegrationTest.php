@@ -89,7 +89,7 @@ class CascadeSoftDeletesIntegrationTest extends PHPUnit_Framework_TestCase
      * @expectedException              \LogicException
      * @expectedExceptionMessageRegExp /.* does not implement Illuminate\\Database\\Eloquent\\SoftDeletes/
      */
-    public function it_takes_excepion_to_models_that_do_not_implement_soft_deletes()
+    public function it_takes_exception_to_models_that_do_not_implement_soft_deletes()
     {
         $post = Tests\Entities\NonSoftDeletingPost::create([
             'title' => 'Testing when you can use this trait',
