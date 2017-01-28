@@ -22,18 +22,32 @@ matrix:
           env: ILLUMINATE_VERSION=5.2.*
         - php: 5.6
           env: ILLUMINATE_VERSION=5.3.*
+        - php: 5.6
+          env: ILLUMINATE_VERSION=5.4.*
         - php: 7.0
           env: ILLUMINATE_VERSION=5.1.*
         - php: 7.0
           env: ILLUMINATE_VERSION=5.2.*
         - php: 7.0
           env: ILLUMINATE_VERSION=5.3.*
+        - php: 7.0
+          env: ILLUMINATE_VERSION=5.4.*
+        - php: 7.1
+          env: ILLUMINATE_VERSION=5.1.*
+        - php: 7.1
+          env: ILLUMINATE_VERSION=5.2.*
+        - php: 7.1
+          env: ILLUMINATE_VERSION=5.3.*
+        - php: 7.1
+          env: ILLUMINATE_VERSION=5.4.*
         - php: nightly
           env: ILLUMINATE_VERSION=5.1.*
         - php: nightly
           env: ILLUMINATE_VERSION=5.2.*
         - php: nightly
           env: ILLUMINATE_VERSION=5.3.*
+        - php: nightly
+          env: ILLUMINATE_VERSION=5.4.*
 
 before_install:
     - composer require "illuminate/database:${ILLUMINATE_VERSION}" --no-update -v
