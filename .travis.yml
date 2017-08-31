@@ -1,11 +1,8 @@
 language: php
 
-php:
-    - '5.4'
-    - '5.5.9'
-    - '5.6'
-    - '7.0'
-    - 'nightly'
+cache:
+  directories:
+    - $HOME/.composer/cache
 
 env:
     - ILLUMINATE_VERSION=5.0.*
@@ -32,6 +29,8 @@ matrix:
           env: ILLUMINATE_VERSION=5.3.*
         - php: 7.0
           env: ILLUMINATE_VERSION=5.4.*
+        - php: 7.0
+          env: ILLUMINATE_VERSION=5.5.*
         - php: 7.1
           env: ILLUMINATE_VERSION=5.1.*
         - php: 7.1
@@ -40,6 +39,8 @@ matrix:
           env: ILLUMINATE_VERSION=5.3.*
         - php: 7.1
           env: ILLUMINATE_VERSION=5.4.*
+        - php: 7.1
+          env: ILLUMINATE_VERSION=5.5.*
         - php: nightly
           env: ILLUMINATE_VERSION=5.1.*
         - php: nightly
@@ -48,6 +49,8 @@ matrix:
           env: ILLUMINATE_VERSION=5.3.*
         - php: nightly
           env: ILLUMINATE_VERSION=5.4.*
+        - php: nightly
+          env: ILLUMINATE_VERSION=5.5.*
 
 before_install:
     - composer require "illuminate/database:${ILLUMINATE_VERSION}" --no-update -v

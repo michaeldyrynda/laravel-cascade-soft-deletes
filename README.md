@@ -1,5 +1,5 @@
 # Cascading soft deletes for the Laravel PHP Framework
-## v1.2.1
+## v1.3.0
 
 ![Travis Build Status](https://travis-ci.org/michaeldyrynda/laravel-cascade-soft-deletes.svg?branch=master)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/michaeldyrynda/laravel-cascade-soft-deletes/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/michaeldyrynda/laravel-cascade-soft-deletes/?branch=master)
@@ -27,6 +27,8 @@ As of `v1.0.5`, the package has better support of `hasOne` relationships ([#10](
 `v1.1.0` adds compatibility with Laravel 5.3.
 
 `v1.2.0` adds compatibility with Laravel 5.4.
+
+`v1.3.0` adds compatibility with Laravel 5.5.
 
 ## Code Samples
 
