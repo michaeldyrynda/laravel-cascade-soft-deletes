@@ -82,7 +82,7 @@ As of right now this is not documented in the Larvel docs, but just know that th
 This trait is installed via [Composer](http://getcomposer.org/). To install, simply add to your `composer.json` file:
 
 ```
-$ composer require iatstuti/laravel-cascade-soft-deletes="~1.3"
+$ composer require iatstuti/laravel-cascade-soft-deletes
 ```
 
 ## Support
