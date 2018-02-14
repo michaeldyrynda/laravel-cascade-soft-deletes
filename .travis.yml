@@ -62,12 +62,12 @@ matrix:
           env: ILLUMINATE_VERSION=5.4.*
         - php: nightly
           env: ILLUMINATE_VERSION=5.5.*
+        - php: nightly
+          env: ILLUMINATE_VERSION=5.6.*
 
-before_install:
-    - composer require "illuminate/database:${ILLUMINATE_VERSION}" --no-update -v
-    - composer require "illuminate/events:${ILLUMINATE_VERSION}" --no-update -v
+before_install: travis_retry composer require "illuminate/database:${ILLUMINATE_VERSION}" "illuminate/events:${ILLUMINATE_VERSION}" --no-update -v
 
-install: composer update --prefer-source --no-interaction --dev -v
+install: travis_retry composer install --prefer-dist --no-interaction --no-suggest -v
 
 script: vendor/bin/phpunit --debug -c phpunit.xml --coverage-clover=coverage.clover
 
