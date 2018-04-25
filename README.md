@@ -50,13 +50,13 @@ class Post extends Model
 
     protected $cascadeDeletes = ['comments'];
 
-	protected $dates = ['deleted_at'];
+    protected $dates = ['deleted_at'];
 
     public function comments()
     {
         return $this->hasMany(Comment::class);
     }
-}    
+}
 ```
 
 Now you can delete an `App\Post` record, and any associated `App\Comment` records will be deleted. If the `App\Comment` record implements the `CascadeSoftDeletes` trait as well, it's children will also be deleted and so on.
