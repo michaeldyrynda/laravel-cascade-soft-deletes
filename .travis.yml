@@ -40,6 +40,8 @@ matrix:
           env: ILLUMINATE_VERSION=5.5.*
         - php: 7.1
           env: ILLUMINATE_VERSION=5.6.*
+        - php: 7.1
+          env: ILLUMINATE_VERSION=5.7.*
         - php: 7.2
           env: ILLUMINATE_VERSION=5.1.*
         - php: 7.2
@@ -52,6 +54,8 @@ matrix:
           env: ILLUMINATE_VERSION=5.5.*
         - php: 7.2
           env: ILLUMINATE_VERSION=5.6.*
+        - php: 7.2
+          env: ILLUMINATE_VERSION=5.7.*
         - php: nightly
           env: ILLUMINATE_VERSION=5.1.*
         - php: nightly
@@ -64,6 +68,8 @@ matrix:
           env: ILLUMINATE_VERSION=5.5.*
         - php: nightly
           env: ILLUMINATE_VERSION=5.6.*
+        - php: nightly
+          env: ILLUMINATE_VERSION=5.7.*
 
 before_install: travis_retry composer require "illuminate/database:${ILLUMINATE_VERSION}" "illuminate/events:${ILLUMINATE_VERSION}" --no-update -v
 
