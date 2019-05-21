@@ -8,6 +8,8 @@ use LogicException;
 
 trait CascadeSoftDeletes
 {
+    protected $cascadeDeletes = [];
+
     /**
      * Boot the trait.
      *
