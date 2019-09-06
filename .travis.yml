@@ -5,10 +5,13 @@ cache:
     - $HOME/.composer/cache
 
 matrix:
+    fast_finish: true
     include:
         - php: 7.2
           env: ILLUMINATE_VERSION=6.0.*
         - php: 7.3
+          env: ILLUMINATE_VERSION=6.0.*
+        - php: 7.4snapshot
           env: ILLUMINATE_VERSION=6.0.*
 
 before_install: travis_retry composer require "illuminate/database:${ILLUMINATE_VERSION}" "illuminate/events:${ILLUMINATE_VERSION}" --no-update -v
