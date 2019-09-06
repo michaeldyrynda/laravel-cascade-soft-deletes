@@ -2,9 +2,10 @@
 
 namespace Iatstuti\Database\Support;
 
+use LogicException;
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use LogicException;
 
 trait CascadeSoftDeletes
 {
@@ -29,7 +30,7 @@ trait CascadeSoftDeletes
             if ($invalidCascadingRelationships = $model->hasInvalidCascadingRelationships()) {
                 throw new LogicException(sprintf(
                     '%s [%s] must exist and return an object of type Illuminate\Database\Eloquent\Relations\Relation',
-                    str_plural('Relationship', count($invalidCascadingRelationships)),
+                    Str::plural('Relationship', count($invalidCascadingRelationships)),
                     join(', ', $invalidCascadingRelationships)
                 ));
             }
