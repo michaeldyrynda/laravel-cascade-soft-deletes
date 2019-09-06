@@ -2,6 +2,7 @@
 
 use PHPUnit\Framework\TestCase;
 use Illuminate\Events\Dispatcher;
+use Iatstuti\Database\Support\CascadeSoftDeleteException;
 use Illuminate\Container\Container;
 use Illuminate\Database\Capsule\Manager;
 
@@ -49,6 +50,17 @@ class CascadeSoftDeletesIntegrationTest extends TestCase
             $table->string('label');
             $table->timestamps();
         });
+
+        $manager->schema()->create('authors__post_types', function ($table) {
+
+            $table->increments('id');
+            $table->integer('author_id');
+            $table->integer('posttype_id');
+            $table->timestamps();
+
+            $table->foreign('author_id')->references('id')->on('author');
+            $table->foreign('posttype_id')->references('id')->on('post_types');
+        });
     }
 
 
@@ -65,6 +77,23 @@ class CascadeSoftDeletesIntegrationTest extends TestCase
         $this->assertCount(3, $post->comments);
         $post->delete();
         $this->assertCount(0, Tests\Entities\Comment::where('post_id', $post->id)->get());
+    }
+
+    /** @test */
+    public function it_cascades_deletes_entries_from_pivot_table()
+    {
+        $author = Tests\Entities\Author::create(['name' => 'ManyToManyTestAuthor']);
+
+        $this->attachPostTypesToAuthor($author);
+        $this->assertCount(2, $author->posttypes);
+
+        $author->delete();
+
+        $pivotEntries = Manager::table('authors__post_types')
+                                ->where('author_id', $author->id)
+                                ->get();
+
+        $this->assertCount(0, $pivotEntries);
     }
 
     /** @test */
@@ -88,7 +117,7 @@ class CascadeSoftDeletesIntegrationTest extends TestCase
      */
     public function it_takes_exception_to_models_that_do_not_implement_soft_deletes()
     {
-        $this->expectException(LogicException::class);
+        $this->expectException(CascadeSoftDeleteException::class);
         $this->expectExceptionMessage('Tests\Entities\NonSoftDeletingPost does not implement Illuminate\Database\Eloquent\SoftDeletes');
 
         $post = Tests\Entities\NonSoftDeletingPost::create([
@@ -106,7 +135,7 @@ class CascadeSoftDeletesIntegrationTest extends TestCase
      */
     public function it_takes_exception_to_models_trying_to_cascade_deletes_on_invalid_relationships()
     {
-        $this->expectException(LogicException::class);
+        $this->expectException(CascadeSoftDeleteException::class);
         $this->expectExceptionMessage('Relationships [invalidRelationship, anotherInvalidRelationship] must exist and return an object of type Illuminate\Database\Eloquent\Relations\Relation');
 
         $post = Tests\Entities\InvalidRelationshipPost::create([
@@ -131,7 +160,7 @@ class CascadeSoftDeletesIntegrationTest extends TestCase
 
         try {
             $post->delete();
-        } catch (LogicException $e) {
+        } catch (CascadeSoftDeleteException $e) {
             $this->assertNotNull(Tests\Entities\InvalidRelationshipPost::find($post->id));
             $this->assertCount(3, Tests\Entities\Comment::where('post_id', $post->id)->get());
         }
@@ -156,10 +185,11 @@ class CascadeSoftDeletesIntegrationTest extends TestCase
 
     /**
      * @test
+
      */
     public function it_handles_situations_where_the_relationship_method_does_not_exist()
     {
-        $this->expectException(LogicException::class);
+        $this->expectException(CascadeSoftDeleteException::class);
         $this->expectExceptionMessage('Relationship [comments] must exist and return an object of type Illuminate\Database\Eloquent\Relations\Relation');
 
         $post = Tests\Entities\PostWithMissingRelationshipMethod::create([
@@ -224,6 +254,25 @@ class CascadeSoftDeletesIntegrationTest extends TestCase
 
         $post->delete();
         $this->assertCount(0, Tests\Entities\PostType::where('id', $type->id)->get());
+    }
+
+    /**
+     * Attach some post types to the given author.
+     *
+     * @return void
+     */
+    public function attachPostTypesToAuthor($author)
+    {
+        $author->posttypes()->saveMany([
+
+            Tests\Entities\PostType::create([
+                'label' => 'First Post Type',
+            ]),
+
+            Tests\Entities\PostType::create([
+                'label' => 'Second Post Type',
+            ]),
+        ]);
     }
 
     /**

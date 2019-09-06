@@ -5,6 +5,7 @@ namespace Iatstuti\Database\Support;
 use LogicException;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
 
 trait CascadeSoftDeletes
@@ -20,33 +21,56 @@ trait CascadeSoftDeletes
     protected static function bootCascadeSoftDeletes()
     {
         static::deleting(function ($model) {
-            if (! $model->implementsSoftDeletes()) {
-                throw new LogicException(sprintf(
-                    '%s does not implement Illuminate\Database\Eloquent\SoftDeletes',
-                    get_called_class()
-                ));
-            }
+            $model->validateCascadingSoftDelete();
 
-            if ($invalidCascadingRelationships = $model->hasInvalidCascadingRelationships()) {
-                throw new LogicException(sprintf(
-                    '%s [%s] must exist and return an object of type Illuminate\Database\Eloquent\Relations\Relation',
-                    Str::plural('Relationship', count($invalidCascadingRelationships)),
-                    join(', ', $invalidCascadingRelationships)
-                ));
-            }
-
-            $delete = $model->forceDeleting ? 'forceDelete' : 'delete';
-
-            foreach ($model->getActiveCascadingDeletes() as $relationship) {
-                if ($model->{$relationship} instanceof Model) {
-                    $model->{$relationship}->{$delete}();
-                } else {
-                    foreach ($model->{$relationship} as $child) {
-                        $child->{$delete}();
-                    }
-                }
-            }
+            $model->runCascadingDeletes();
         });
+    }
+
+
+    /**
+     * Validate that the calling model is correctly setup for cascading soft deletes.
+     *
+     * @throws \Iatstuti\Database\Support\CascadeSoftDeleteException
+     */
+    protected function validateCascadingSoftDelete()
+    {
+        if (! $this->implementsSoftDeletes()) {
+            throw CascadeSoftDeleteException::softDeleteNotImplemented(get_called_class());
+        }
+
+        if ($invalidCascadingRelationships = $this->hasInvalidCascadingRelationships()) {
+            throw CascadeSoftDeleteException::invalidRelationships($invalidCascadingRelationships);
+        }
+    }
+
+
+    /**
+     * Run the cascading soft delete for this model.
+     *
+     * @return void
+     */
+    protected function runCascadingDeletes()
+    {
+        foreach ($this->getActiveCascadingDeletes() as $relationship) {
+            $this->cascadeSoftDeletes($relationship);
+        }
+    }
+
+
+    /**
+     * Cascade delete the given relationship on the given mode.
+     *
+     * @param  string  $relationship
+     * @return return
+     */
+    protected function cascadeSoftDeletes($relationship)
+    {
+        $delete = $this->forceDeleting ? 'forceDelete' : 'delete';
+
+        foreach ($this->{$relationship}()->get() as $model) {
+            $model->pivot ? $model->pivot->{$delete}() : $model->{$delete}();
+        }
     }
 
 
