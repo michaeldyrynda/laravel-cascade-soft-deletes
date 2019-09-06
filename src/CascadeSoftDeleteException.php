@@ -3,6 +3,7 @@
 namespace Iatstuti\Database\Support;
 
 use Exception;
+use Illuminate\Support\Str;
 
 class CascadeSoftDeleteException extends Exception
 {
@@ -16,7 +17,7 @@ class CascadeSoftDeleteException extends Exception
     {
         return new static(sprintf(
             '%s [%s] must exist and return an object of type Illuminate\Database\Eloquent\Relations\Relation',
-            str_plural('Relationship', count($relationships)),
+            Str::plural('Relationship', count($relationships)),
             join(', ', $relationships)
         ));
     }
