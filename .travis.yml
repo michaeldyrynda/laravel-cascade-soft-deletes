@@ -10,8 +10,6 @@ matrix:
           env: ILLUMINATE_VERSION=6.0.*
         - php: 7.3
           env: ILLUMINATE_VERSION=6.0.*
-        - php: nightly
-          env: ILLUMINATE_VERSION=6.0.*
 
 before_install: travis_retry composer require "illuminate/database:${ILLUMINATE_VERSION}" "illuminate/events:${ILLUMINATE_VERSION}" --no-update -v
 
