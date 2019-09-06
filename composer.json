@@ -3,12 +3,12 @@
     "description": "Cascading deletes for Eloquent models that implement soft deletes",
     "type": "utility",
     "require": {
-        "php": ">=5.4",
-        "illuminate/database": "~5.0",
-        "illuminate/events": "~5.0"
+        "php": "^7.2",
+        "illuminate/database": "^6.0",
+        "illuminate/events": "^6.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "^4.8"
+        "phpunit/phpunit": "^8.0"
     },
     "autoload": {
         "psr-4": {

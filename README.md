@@ -1,5 +1,5 @@
 # Cascading soft deletes for the Laravel PHP Framework
-## v1.4.0
+## v2.0.0
 
 ![Travis Build Status](https://travis-ci.org/michaeldyrynda/laravel-cascade-soft-deletes.svg?branch=master)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/michaeldyrynda/laravel-cascade-soft-deletes/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/michaeldyrynda/laravel-cascade-soft-deletes/?branch=master)
@@ -17,20 +17,6 @@ Normally, you would use your database's foreign key constraints, adding an `ON D
 It may be useful to be able to restore a parent record after it was deleted. In those instances, you may reach for Laravel's [soft deleting](https://laravel.com/docs/5.2/eloquent#soft-deleting) functionality.
 
 In doing so, however, you lose the ability to use the cascading delete functionality that your database would otherwise provide. That is where this package aims to bridge the gap in functionality when using the `SoftDeletes` trait.
-
-As of `v1.0.2`, you can inherit `CascadeSoftDeletes` from a base model class, you no longer need to use the trait on each child if all of your models happen to implement `SoftDeletes`.
-
-As of `v1.0.4`, the package supports cascading deletes of grandchildren records ([#8](https://github.com/michaeldyrynda/laravel-cascade-soft-deletes/issues/8), [#9](https://github.com/michaeldyrynda/laravel-cascade-soft-deletes/pull/9)).
-
-As of `v1.0.5`, the package has better support of `hasOne` relationships ([#10](https://github.com/michaeldyrynda/laravel-cascade-soft-deletes/issues/10), [#11](https://github.com/michaeldyrynda/laravel-cascade-soft-deletes/issues/11)).
-
-`v1.1.0` adds compatibility with Laravel 5.3.
-
-`v1.2.0` adds compatibility with Laravel 5.4.
-
-`v1.3.0` adds compatibility with Laravel 5.5.
-
-`v1.4.0` adds compatibility with Laravel 5.6.
 
 ## Code Samples
 
