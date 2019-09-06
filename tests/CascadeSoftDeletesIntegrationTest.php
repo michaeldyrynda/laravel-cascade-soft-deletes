@@ -1,15 +1,14 @@
 <?php
 
+use PHPUnit\Framework\TestCase;
+use Illuminate\Events\Dispatcher;
 use Iatstuti\Database\Support\CascadeSoftDeleteException;
 use Illuminate\Container\Container;
 use Illuminate\Database\Capsule\Manager;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Events\Dispatcher;
 
-class CascadeSoftDeletesIntegrationTest extends PHPUnit_Framework_TestCase
+class CascadeSoftDeletesIntegrationTest extends TestCase
 {
-    public static function setupBeforeClass()
+    public static function setupBeforeClass(): void
     {
         $manager = new Manager();
         $manager->addConnection([
@@ -115,11 +114,12 @@ class CascadeSoftDeletesIntegrationTest extends PHPUnit_Framework_TestCase
 
     /**
      * @test
-     * @expectedException              \Iatstuti\Database\Support\CascadeSoftDeleteException
-     * @expectedExceptionMessageRegExp /.* does not implement Illuminate\\Database\\Eloquent\\SoftDeletes/
      */
-    public function it_takes_excepion_to_models_that_do_not_implement_soft_deletes()
+    public function it_takes_exception_to_models_that_do_not_implement_soft_deletes()
     {
+        $this->expectException(CascadeSoftDeleteException::class);
+        $this->expectExceptionMessage('Tests\Entities\NonSoftDeletingPost does not implement Illuminate\Database\Eloquent\SoftDeletes');
+
         $post = Tests\Entities\NonSoftDeletingPost::create([
             'title' => 'Testing when you can use this trait',
             'body'  => 'Ensure that you can only use this trait if it uses SoftDeletes',
@@ -132,11 +132,12 @@ class CascadeSoftDeletesIntegrationTest extends PHPUnit_Framework_TestCase
 
     /**
      * @test
-     * @expectedException              \Iatstuti\Database\Support\CascadeSoftDeleteException
-     * @expectedExceptionMessageRegExp /.* \[.*\] must exist and return an object of type Illuminate\\Database\\Eloquent\\Relations\\Relation/
      */
     public function it_takes_exception_to_models_trying_to_cascade_deletes_on_invalid_relationships()
     {
+        $this->expectException(CascadeSoftDeleteException::class);
+        $this->expectExceptionMessage('Relationships [invalidRelationship, anotherInvalidRelationship] must exist and return an object of type Illuminate\Database\Eloquent\Relations\Relation');
+
         $post = Tests\Entities\InvalidRelationshipPost::create([
             'title' => 'Testing invalid cascade relationships',
             'body'  => 'Ensure you can only use this trait if the model defines valid relationships',
@@ -184,11 +185,13 @@ class CascadeSoftDeletesIntegrationTest extends PHPUnit_Framework_TestCase
 
     /**
      * @test
-     * @expectedException              \Iatstuti\Database\Support\CascadeSoftDeleteException
-     * @expectedExceptionMessageRegExp /Relationship \[.*\] must exist and return an object of type Illuminate\\Database\\Eloquent\\Relations\\Relation/
+
      */
     public function it_handles_situations_where_the_relationship_method_does_not_exist()
     {
+        $this->expectException(CascadeSoftDeleteException::class);
+        $this->expectExceptionMessage('Relationship [comments] must exist and return an object of type Illuminate\Database\Eloquent\Relations\Relation');
+
         $post = Tests\Entities\PostWithMissingRelationshipMethod::create([
             'title' => 'Testing that missing relationship methods are accounted for',
             'body'  => 'In this way, you need not worry about Laravel returning fatal errors',

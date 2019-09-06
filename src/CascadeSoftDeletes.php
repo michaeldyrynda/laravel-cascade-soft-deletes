@@ -2,6 +2,8 @@
 
 namespace Iatstuti\Database\Support;
 
+use LogicException;
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
