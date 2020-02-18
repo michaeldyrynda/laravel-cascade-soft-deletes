@@ -7,6 +7,7 @@
 [![Latest Stable Version](https://poser.pugx.org/iatstuti/laravel-cascade-soft-deletes/v/stable)](https://packagist.org/packages/iatstuti/laravel-cascade-soft-deletes)
 [![Total Downloads](https://poser.pugx.org/iatstuti/laravel-cascade-soft-deletes/downloads)](https://packagist.org/packages/iatstuti/laravel-cascade-soft-deletes)
 [![License](https://poser.pugx.org/iatstuti/laravel-cascade-soft-deletes/license)](https://packagist.org/packages/iatstuti/laravel-cascade-soft-deletes)
+[![Buy us a tree](https://img.shields.io/badge/Treeware-%F0%9F%8C%B3-lightgreen?style=for-the-badge)](https://offset.earth/treeware?gift-trees)
 
 ## Introduction
 
@@ -80,3 +81,13 @@ If you are having general issues with this package, feel free to contact me on [
 If you believe you have found an issue, please report it using the [GitHub issue tracker](https://github.com/michaeldyrynda/laravel-cascade-soft-deletes/issues), or better yet, fork the repository and submit a pull request.
 
 If you're using this package, I'd love to hear your thoughts. Thanks!
+
+## Treeware
+
+You're free to use this package, but if it makes it to your production environment you are required to buy the world a tree.
+
+It’s now common knowledge that one of the best tools to tackle the climate crisis and keep our temperatures from rising above 1.5C is to plant trees. If you support this package and contribute to the Treeware forest you’ll be creating employment for local families and restoring wildlife habitats.
+
+You can buy trees [here](https://offset.earth/treeware)
+
+Read more about Treeware at [treeware.earth](https://treeware.earth)
