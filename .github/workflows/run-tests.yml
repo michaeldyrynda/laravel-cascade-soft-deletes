@@ -1,0 +1,44 @@
+name: run-tests
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: "0 0 * * *"
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        php: [7.4, 7.3]
+        laravel: [^8.0]
+        dependency-version: [prefer-lowest, prefer-stable]
+        os: [ubuntu-latest]
+
+    name: P${{ matrix.php }} - L${{ matrix.laravel }} ${{ matrix.dependency-version }} - ${{ matrix.os }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with: 
+          path: ~/.composer/cache/files
+          key: dependencies-php-${{ matrix.php }}-composer-${{ hashFiles('composer.json') }}
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: json, dom, curl, libxml, mbstring, pdo, sqlite, pdo_sqlite
+          coverage: none
+
+      - name: Install dependencies
+        run: |
+          composer update --${{ matrix.dependency-version }} --prefer-dist --no-interaction --no-suggest
+
+      - name: Execute tests
+        run: vendor/bin/phpunit
