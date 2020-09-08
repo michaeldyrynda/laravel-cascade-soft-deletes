@@ -1,32 +1,38 @@
 {
-    "name": "iatstuti/laravel-cascade-soft-deletes",
-    "description": "Cascading deletes for Eloquent models that implement soft deletes",
-    "type": "utility",
-    "require": {
-        "php": "^7.2.5",
-        "illuminate/database": "^6.0|^7.0",
-        "illuminate/events": "^6.0|^7.0"
-    },
-    "require-dev": {
-        "phpunit/phpunit": "^8.0"
-    },
-    "autoload": {
-        "psr-4": {
-            "Iatstuti\\Database\\Support\\": "src/"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "Tests\\": "tests/"
-        }
-    },
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "Michael Dyrynda",
-            "email": "michael@dyrynda.com.au",
-            "homepage": "https://dyrynda.com.au"
-        }
-    ],
-    "minimum-stability": "stable"
+  "name": "dyrynda/laravel-cascade-soft-deletes",
+  "description": "Cascading deletes for Eloquent models that implement soft deletes",
+  "type": "utility",
+  "require": {
+    "php": "^7.3",
+    "illuminate/database": "^8.0",
+    "illuminate/events": "^8.0"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^9.3"
+  },
+  "autoload": {
+    "psr-4": {
+      "Iatstuti\\Database\\Support\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Tests\\": "tests/"
+    }
+  },
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Michael Dyrynda",
+      "email": "michael@dyrynda.com.au",
+      "homepage": "https://dyrynda.com.au"
+    }
+  ],
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "config": {
+    "extra": {
+      "sort-packages": true
+    }
+  }
 }
