@@ -1,12 +1,9 @@
 # Cascading soft deletes for the Laravel PHP Framework
-## v3.0.0
 
-![Travis Build Status](https://travis-ci.org/michaeldyrynda/laravel-cascade-soft-deletes.svg?branch=master)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/michaeldyrynda/laravel-cascade-soft-deletes/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/michaeldyrynda/laravel-cascade-soft-deletes/?branch=master)
-[![Code Coverage](https://scrutinizer-ci.com/g/michaeldyrynda/laravel-cascade-soft-deletes/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/michaeldyrynda/laravel-cascade-soft-deletes/?branch=master)
-[![Latest Stable Version](https://poser.pugx.org/iatstuti/laravel-cascade-soft-deletes/v/stable)](https://packagist.org/packages/iatstuti/laravel-cascade-soft-deletes)
-[![Total Downloads](https://poser.pugx.org/iatstuti/laravel-cascade-soft-deletes/downloads)](https://packagist.org/packages/iatstuti/laravel-cascade-soft-deletes)
-[![License](https://poser.pugx.org/iatstuti/laravel-cascade-soft-deletes/license)](https://packagist.org/packages/iatstuti/laravel-cascade-soft-deletes)
+[![Build Status](https://github.com/michaeldyrynda/laravel-cascade-soft-deletes/workflows/run-tests/badge.svg)](https://github.com/michaeldyrynda/laravel-cascade-soft-deletes/actions?query=workflow%3Arun-tests)
+[![Latest Stable Version](https://poser.pugx.org/iatstuti/laravel-cascade-soft-deletes/v/stable)](https://packagist.org/packages/dyrynda/laravel-cascade-soft-deletes)
+[![Total Downloads](https://poser.pugx.org/dyrynda/laravel-cascade-soft-deletes/downloads)](https://packagist.org/packages/dyrynda/laravel-cascade-soft-deletes)
+[![License](https://poser.pugx.org/dyrynda/laravel-cascade-soft-deletes/license)](https://packagist.org/packages/dyrynda/laravel-cascade-soft-deletes)
 [![Buy us a tree](https://img.shields.io/badge/Treeware-%F0%9F%8C%B3-lightgreen)](https://plant.treeware.earth/michaeldyrynda/laravel-cascade-soft-deletes)
 
 ## Introduction
