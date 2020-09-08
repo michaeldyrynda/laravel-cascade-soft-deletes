@@ -2,9 +2,9 @@
 
 use PHPUnit\Framework\TestCase;
 use Illuminate\Events\Dispatcher;
-use Iatstuti\Database\Support\CascadeSoftDeleteException;
 use Illuminate\Container\Container;
 use Illuminate\Database\Capsule\Manager;
+use Dyrynda\Database\Support\CascadeSoftDeleteException;
 
 class CascadeSoftDeletesIntegrationTest extends TestCase
 {
@@ -52,7 +52,6 @@ class CascadeSoftDeletesIntegrationTest extends TestCase
         });
 
         $manager->schema()->create('authors__post_types', function ($table) {
-
             $table->increments('id');
             $table->integer('author_id');
             $table->integer('posttype_id');

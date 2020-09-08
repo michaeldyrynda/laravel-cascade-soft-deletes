@@ -1,11 +1,8 @@
 <?php
 
-namespace Iatstuti\Database\Support;
+namespace Dyrynda\Database\Support;
 
-use LogicException;
-use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
 
 trait CascadeSoftDeletes
@@ -31,7 +28,7 @@ trait CascadeSoftDeletes
     /**
      * Validate that the calling model is correctly setup for cascading soft deletes.
      *
-     * @throws \Iatstuti\Database\Support\CascadeSoftDeleteException
+     * @throws \Dyrynda\Database\Support\CascadeSoftDeleteException
      */
     protected function validateCascadingSoftDelete()
     {

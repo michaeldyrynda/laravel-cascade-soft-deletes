@@ -1,7 +1,7 @@
 # Cascading soft deletes for the Laravel PHP Framework
 
 [![Build Status](https://github.com/michaeldyrynda/laravel-cascade-soft-deletes/workflows/run-tests/badge.svg)](https://github.com/michaeldyrynda/laravel-cascade-soft-deletes/actions?query=workflow%3Arun-tests)
-[![Latest Stable Version](https://poser.pugx.org/iatstuti/laravel-cascade-soft-deletes/v/stable)](https://packagist.org/packages/dyrynda/laravel-cascade-soft-deletes)
+[![Latest Stable Version](https://poser.pugx.org/dyrynda/laravel-cascade-soft-deletes/v/stable)](https://packagist.org/packages/dyrynda/laravel-cascade-soft-deletes)
 [![Total Downloads](https://poser.pugx.org/dyrynda/laravel-cascade-soft-deletes/downloads)](https://packagist.org/packages/dyrynda/laravel-cascade-soft-deletes)
 [![License](https://poser.pugx.org/dyrynda/laravel-cascade-soft-deletes/license)](https://packagist.org/packages/dyrynda/laravel-cascade-soft-deletes)
 [![Buy us a tree](https://img.shields.io/badge/Treeware-%F0%9F%8C%B3-lightgreen)](https://plant.treeware.earth/michaeldyrynda/laravel-cascade-soft-deletes)
@@ -24,7 +24,7 @@ In doing so, however, you lose the ability to use the cascading delete functiona
 namespace App;
 
 use App\Comment;
-use Iatstuti\Database\Support\CascadeSoftDeletes;
+use Dyrynda\Database\Support\CascadeSoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -68,7 +68,7 @@ As of right now this is not documented in the Larvel docs, but just know that th
 This trait is installed via [Composer](http://getcomposer.org/). To install, simply add to your `composer.json` file:
 
 ```
-$ composer require iatstuti/laravel-cascade-soft-deletes
+$ composer require dyrynda/laravel-cascade-soft-deletes
 ```
 
 ## Support

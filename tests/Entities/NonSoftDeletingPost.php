@@ -2,8 +2,8 @@
 
 namespace Tests\Entities;
 
-use Iatstuti\Database\Support\CascadeSoftDeletes;
 use Illuminate\Database\Eloquent\Model;
+use Dyrynda\Database\Support\CascadeSoftDeletes;
 
 class NonSoftDeletingPost extends Model
 {

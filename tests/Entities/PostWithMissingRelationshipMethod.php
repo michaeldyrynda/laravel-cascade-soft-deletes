@@ -2,17 +2,17 @@
 
 namespace Tests\Entities;
 
-use Iatstuti\Database\Support\CascadeSoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Dyrynda\Database\Support\CascadeSoftDeletes;
 
 class PostWithMissingRelationshipMethod extends Model
 {
     use SoftDeletes, CascadeSoftDeletes;
 
-    protected $table = 'posts';
-
     public $dates = ['deleted_at'];
+
+    protected $table = 'posts';
 
     protected $cascadeDeletes = 'comments';
 

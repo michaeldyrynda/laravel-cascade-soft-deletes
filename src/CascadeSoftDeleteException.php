@@ -1,6 +1,6 @@
 <?php
 
-namespace Iatstuti\Database\Support;
+namespace Dyrynda\Database\Support;
 
 use Exception;
 use Illuminate\Support\Str;
