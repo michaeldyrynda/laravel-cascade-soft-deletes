@@ -3,7 +3,7 @@
   "description": "Cascading deletes for Eloquent models that implement soft deletes",
   "type": "utility",
   "require": {
-    "php": "^7.3",
+    "php": "^7.3|^8.0",
     "illuminate/database": "^8.0",
     "illuminate/events": "^8.0"
   },
