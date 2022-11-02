@@ -66,7 +66,7 @@ trait CascadeSoftDeletes
         $delete = $this->forceDeleting ? 'forceDelete' : 'delete';
 
         foreach ($this->{$relationship}()->get() as $model) {
-            $model->pivot ? $model->pivot->{$delete}() : $model->{$delete}();
+            isset($model->pivot) ? $model->pivot->{$delete}() : $model->{$delete}();
         }
     }
 
