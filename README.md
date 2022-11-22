@@ -54,15 +54,6 @@ $post->delete(); // Soft delete the post, which will also trigger the delete() m
 
 Because this trait hooks into the `deleting` Eloquent model event, we can prevent the parent record from being deleted as well as any child records, if any exception is triggered. A `LogicException` will be triggered if the model does not use the `Illuminate\Database\Eloquent\SoftDeletes` trait, or if any of the defined `cascadeDeletes` relationships do not exist, or do not return an instance of `Illuminate\Database\Eloquent\Relations\Relation`.
 
-**Additional Note**:  If you already have existing event listeners in place for a model that is going to cascade soft deletes, you can adjust the priority or firing order of events to have CascadeSoftDeletes fire after your event.  To do this you can set the priority of your deleting event listener to be 1.
-
-`MODEL::observe( MODELObserver::class, 1 );`  The second param is the priority.
-
-`MODEL::deleting( MODELObserver::class, 1 );`
-
-As of right now this is not documented in the Larvel docs, but just know that the default priority is `0` for all listeners, and that `0` is the lowest priority.  Passing a param of greater than `0` to your listener will cause your listener to fire before listeners with default priority of `0`
-
-
 ## Installation
 
 This trait is installed via [Composer](http://getcomposer.org/). To install, simply add to your `composer.json` file:
