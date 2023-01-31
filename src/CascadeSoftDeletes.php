@@ -2,7 +2,6 @@
 
 namespace Dyrynda\Database\Support;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 
 trait CascadeSoftDeletes
@@ -22,6 +21,15 @@ trait CascadeSoftDeletes
 
             $model->runCascadingDeletes();
         });
+
+        if (method_exists(self::class, 'restoring')) {
+            static::restoring(function ($model) {
+                $model->validateCascadingSoftDelete();
+
+                $model->runCascadingRestores();
+            });
+        }
+
     }
 
 
@@ -32,12 +40,37 @@ trait CascadeSoftDeletes
      */
     protected function validateCascadingSoftDelete()
     {
-        if (! $this->implementsSoftDeletes()) {
+        if (!$this->implementsSoftDeletes()) {
             throw CascadeSoftDeleteException::softDeleteNotImplemented(get_called_class());
         }
 
         if ($invalidCascadingRelationships = $this->hasInvalidCascadingRelationships()) {
             throw CascadeSoftDeleteException::invalidRelationships($invalidCascadingRelationships);
+        }
+    }
+
+    /**
+     * Run the cascading restoration for this model.
+     *
+     * @return void
+     */
+    protected function runCascadingRestores()
+    {
+        foreach ($this->getActiveCascadingDeletes(true) as $relationship) {
+            $this->cascadeRestores($relationship);
+        }
+    }
+
+    /**
+     * Cascade restore the given relationship.
+     *
+     * @param  string  $relationship
+     * @return void
+     */
+    protected function cascadeRestores($relationship)
+    {
+        foreach ($this->{$relationship}()->withTrashed()->get() as $model) {
+            isset($model->pivot) ? $model->pivot->restore() : $model->restore();
         }
     }
 
@@ -59,7 +92,7 @@ trait CascadeSoftDeletes
      * Cascade delete the given relationship on the given mode.
      *
      * @param  string  $relationship
-     * @return return
+     * @return void
      */
     protected function cascadeSoftDeletes($relationship)
     {
@@ -76,9 +109,9 @@ trait CascadeSoftDeletes
      *
      * @return bool
      */
-    protected function implementsSoftDeletes()
+    protected static function implementsSoftDeletes()
     {
-        return method_exists($this, 'runSoftDelete');
+        return method_exists(self::class, 'runSoftDelete');
     }
 
 
@@ -93,7 +126,7 @@ trait CascadeSoftDeletes
     protected function hasInvalidCascadingRelationships()
     {
         return array_filter($this->getCascadingDeletes(), function ($relationship) {
-            return ! method_exists($this, $relationship) || ! $this->{$relationship}() instanceof Relation;
+            return !method_exists($this, $relationship) || !$this->{$relationship}() instanceof Relation;
         });
     }
 
@@ -112,12 +145,15 @@ trait CascadeSoftDeletes
     /**
      * For the cascading deletes defined on the model, return only those that are not null.
      *
+     * If $isRestore is provided true
+     * For the cascading deletes defined on the model, return only those that are trashed.
+     * 
      * @return array
      */
-    protected function getActiveCascadingDeletes()
+    protected function getActiveCascadingDeletes($isRestore = false)
     {
-        return array_filter($this->getCascadingDeletes(), function ($relationship) {
-            return $this->{$relationship}()->exists();
+        return array_filter($this->getCascadingDeletes(), function ($relationship) use ($isRestore) {
+            return $isRestore ? $this->{$relationship}()->withTrashed()->exists() : $this->{$relationship}()->exists();
         });
     }
 }
