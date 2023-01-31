@@ -56,7 +56,7 @@ trait CascadeSoftDeletes
      */
     protected function runCascadingRestores()
     {
-        foreach ($this->getActiveCascadingDeletes(true) as $relationship) {
+        foreach ($this->getRelatedSoftDeletedModels() as $relationship) {
             $this->cascadeRestores($relationship);
         }
     }
@@ -145,15 +145,27 @@ trait CascadeSoftDeletes
     /**
      * For the cascading deletes defined on the model, return only those that are not null.
      *
-     * If $isRestore is provided true
-     * For the cascading deletes defined on the model, return only those that are trashed.
-     * 
      * @return array
      */
-    protected function getActiveCascadingDeletes($isRestore = false)
+    protected function getActiveCascadingDeletes()
     {
-        return array_filter($this->getCascadingDeletes(), function ($relationship) use ($isRestore) {
-            return $isRestore ? $this->{$relationship}()->withTrashed()->exists() : $this->{$relationship}()->exists();
+        return array_filter($this->getCascadingDeletes(), function ($relationship) {
+            return $this->{$relationship}()->exists();
+        });
+    }
+
+    /**
+     * For the cascading deletes defined on the model, return only those that are trashed.
+     * @return array
+     */
+    protected function getRelatedSoftDeletedModels()
+    {
+        return array_filter($this->getCascadingDeletes(), function ($relationship) {
+            try {
+                return $this->{$relationship}()->withTrashed()->exists();
+            } catch (\BadMethodCallException $e) {
+                return false;
+            }
         });
     }
 }

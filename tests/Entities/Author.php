@@ -25,4 +25,9 @@ class Author extends Model
     {
         return $this->belongsToMany('Tests\Entities\PostType', 'authors__post_types', 'author_id', 'posttype_id');
     }
+
+    public function hassoftdeletespivots()
+    {
+        return $this->belongsToMany('Tests\Entities\HasSoftDeletesPivot', 'authors__has_soft_deletes_pivots', 'author_id', 'hassoftdeletespivot_id')->withTimestamps()->withPivot(['deleted_at']);
+    }
 }

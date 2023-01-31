@@ -2,9 +2,7 @@
 
 namespace Tests\Entities;
 
-use Illuminate\Database\Eloquent\Model;
 use Tests\Entities\Post;
-use Tests\Entities\Comment;
 
 class ChildPost extends Post
 {

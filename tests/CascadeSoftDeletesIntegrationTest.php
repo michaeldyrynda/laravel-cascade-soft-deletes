@@ -57,11 +57,36 @@ class CascadeSoftDeletesIntegrationTest extends TestCase
             $table->integer('posttype_id');
             $table->timestamps();
 
-            $table->foreign('author_id')->references('id')->on('author');
+            $table->foreign('author_id')->references('id')->on('authors');
             $table->foreign('posttype_id')->references('id')->on('post_types');
         });
-    }
 
+        $manager->schema()->create('soft_delete_comments', function ($table) {
+            $table->increments('id');
+            $table->integer('post_id')->unsigned();
+            $table->string('body');
+            $table->timestamps();
+            $table->softDeletes();
+        });
+
+        $manager->schema()->create('has_soft_deletes_pivots', function ($table) {
+            $table->increments('id');
+            $table->string('label');
+            $table->timestamps();
+        });
+
+        $manager->schema()->create('authors__has_soft_deletes_pivots', function ($table) {
+            $table->increments('id');
+            $table->integer('author_id');
+            $table->integer('hassoftdeletespivot_id');
+            $table->timestamps();
+            $table->softDeletes();
+
+            $table->foreign('author_id')->references('id')->on('authors');
+            $table->foreign('hassoftdeletespivot_id')->references('id')->on('has_soft_deleted_pivots');
+        });
+
+    }
 
     /** @test */
     public function it_cascades_deletes_when_deleting_a_parent_model()
@@ -76,7 +101,11 @@ class CascadeSoftDeletesIntegrationTest extends TestCase
         $this->assertCount(3, $post->comments);
         $post->delete();
         $this->assertCount(0, Tests\Entities\Comment::where('post_id', $post->id)->get());
+
+        Manager::table('posts')->truncate();
+        Manager::table('comments')->truncate();
     }
+
 
     /** @test */
     public function it_cascades_deletes_entries_from_pivot_table()
@@ -93,6 +122,10 @@ class CascadeSoftDeletesIntegrationTest extends TestCase
             ->get();
 
         $this->assertCount(0, $pivotEntries);
+
+        Manager::table('authors')->truncate();
+        Manager::table('post_types')->truncate();
+        Manager::table('authors__post_types')->truncate();
     }
 
     /** @test */
@@ -109,6 +142,9 @@ class CascadeSoftDeletesIntegrationTest extends TestCase
         $post->forceDelete();
         $this->assertCount(0, Tests\Entities\Comment::where('post_id', $post->id)->get());
         $this->assertCount(0, Tests\Entities\Post::withTrashed()->where('id', $post->id)->get());
+
+        Manager::table('posts')->truncate();
+        Manager::table('comments')->truncate();
     }
 
     /**
@@ -180,11 +216,14 @@ class CascadeSoftDeletesIntegrationTest extends TestCase
         $this->assertNull(Tests\Entities\Post::find($post->id));
         $this->assertCount(1, Tests\Entities\Post::withTrashed()->where('id', $post->id)->get());
         $this->assertCount(0, Tests\Entities\Comment::where('post_id', $post->id)->get());
+
+        Manager::table('posts')->truncate();
+        Manager::table('comments')->truncate();
     }
 
     /**
-    * @test
-    */
+     * @test
+     */
     public function it_handles_situations_where_the_relationship_method_does_not_exist()
     {
         $this->expectException(CascadeSoftDeleteException::class);
@@ -213,6 +252,9 @@ class CascadeSoftDeletesIntegrationTest extends TestCase
         $this->assertNull(Tests\Entities\ChildPost::find($post->id));
         $this->assertCount(1, Tests\Entities\ChildPost::withTrashed()->where('id', $post->id)->get());
         $this->assertCount(0, Tests\Entities\Comment::where('post_id', $post->id)->get());
+
+        Manager::table('posts')->truncate();
+        Manager::table('comments')->truncate();
     }
 
     /** @test */
@@ -236,6 +278,9 @@ class CascadeSoftDeletesIntegrationTest extends TestCase
         foreach ($deletedPosts as $deletedPost) {
             $this->assertCount(0, Tests\Entities\Comment::where('post_id', $deletedPost->id)->get());
         }
+        Manager::table('authors')->truncate();
+        Manager::table('posts')->truncate();
+        Manager::table('comments')->truncate();
     }
 
     /** @test */
@@ -252,11 +297,185 @@ class CascadeSoftDeletesIntegrationTest extends TestCase
 
         $post->delete();
         $this->assertCount(0, Tests\Entities\PostType::where('id', $type->id)->get());
+
+        Manager::table('posts')->truncate();
+        Manager::table('post_types')->truncate();
     }
 
-    public function it_cascades_restores_when_restoring_from_parent_model()
+    /** @test */
+    public function it_restores_only_the_parent_model_when_child_not_implementing_soft_delete()
     {
-        $this->assertTrue(true);
+        $post = Tests\Entities\Post::create([
+            'title' => 'How to do basic restore soft delete in Laravel',
+            'body' => "It only restores parent model when child model doesn't implementing soft deletes",
+        ]);
+
+        $this->attachCommentsToPost($post);
+        $this->assertCount(3, $post->comments);
+        $post->delete();
+        $post->restore();
+        $this->assertCount(0, Tests\Entities\Comment::where('post_id', $post->id)->get());
+        $this->assertCount(1, Tests\Entities\Post::get());
+
+        Manager::table('posts')->truncate();
+        Manager::table('comments')->truncate();
+    }
+
+    /** @test */
+    public function it_restores_the_parent_and_child_model_when_child_implementing_soft_delete()
+    {
+        $author = Tests\Entities\Author::create([
+            'name' => 'Testing child can be restored',
+        ]);
+
+        $this->attachPostsToAuthor($author);
+
+        $author->delete();
+
+        $this->assertNull(Tests\Entities\Author::find($author->id));
+        $this->assertCount(1, Tests\Entities\Author::withTrashed()->where('id', $author->id)->get());
+        $this->assertCount(0, Tests\Entities\Post::where('author_id', $author->id)->get());
+
+        $deletedPosts = Tests\Entities\Post::withTrashed()->where('author_id', $author->id)->get();
+        $this->assertCount(2, $deletedPosts);
+
+        $author->restore();
+
+        $this->assertCount(1, Tests\Entities\Author::where('id', $author->id)->get());
+        $this->assertCount(2, Tests\Entities\Post::where('author_id', $author->id)->get());
+
+        Manager::table('authors')->truncate();
+        Manager::table('posts')->truncate();
+    }
+
+    /** @test */
+    public function it_restores_only_the_parent_model_when_pivot_not_implementing_soft_delete()
+    {
+        $author = Tests\Entities\Author::create(['name' => 'ManyToManyTestAuthor']);
+
+        $this->attachPostTypesToAuthor($author);
+        $this->assertCount(2, $author->posttypes);
+
+
+        $author->delete();
+        $author->restore();
+
+        $pivotEntries = Manager::table('authors__post_types')
+            ->where('author_id', $author->id)
+            ->get();
+        $this->assertCount(1, Tests\Entities\Author::get());
+        $this->assertCount(0, $pivotEntries);
+
+        Manager::table('authors')->truncate();
+        Manager::table('post_types')->truncate();
+        Manager::table('authors__post_types')->truncate();
+    }
+
+    /** @test */
+    public function it_restores_the_parent_and_pivot_model_when_pivot_implementing_soft_delete()
+    {
+        $author = Tests\Entities\Author::create(['name' => 'ManyToManyTestAuthor']);
+
+        $this->attachHasSoftDeletesPivotsToAuthor($author);
+        $this->assertCount(2, $author->hassoftdeletespivots);
+
+
+        $author->delete();
+        $author->restore();
+
+        $pivotEntries = Manager::table('authors__has_soft_deletes_pivots')
+            ->where('author_id', $author->id)
+            ->get();
+        $this->assertCount(1, Tests\Entities\Author::get());
+        $this->assertCount(2, $pivotEntries);
+
+        Manager::table('authors')->truncate();
+        Manager::table('post_types')->truncate();
+        Manager::table('authors__post_types')->truncate();
+    }
+
+    /** @test */
+    public function it_restores_the_parent_and_child_model_when_child_implementing_soft_delete_but_not_the_grandchild()
+    {
+        $author = Tests\Entities\Author::create([
+            'name' => 'Testing child can be restored',
+        ]);
+
+        $this->attachPostsAndCommentsToAuthor($author);
+
+        $author->delete();
+
+        $this->assertNull(Tests\Entities\Author::find($author->id));
+        $this->assertCount(1, Tests\Entities\Author::withTrashed()->where('id', $author->id)->get());
+        $this->assertCount(0, Tests\Entities\Post::where('author_id', $author->id)->get());
+
+        $deletedPosts = Tests\Entities\Post::withTrashed()->where('author_id', $author->id)->get();
+        $this->assertCount(2, $deletedPosts);
+
+        $author->restore();
+
+        $this->assertCount(1, Tests\Entities\Author::where('id', $author->id)->get());
+        $this->assertCount(2, Tests\Entities\Post::where('author_id', $author->id)->get());
+
+        foreach ($deletedPosts as $deletedPost) {
+            $this->assertCount(0, Tests\Entities\Comment::where('post_id', $deletedPost->id)->get());
+        }
+
+        Manager::table('authors')->truncate();
+        Manager::table('posts')->truncate();
+        Manager::table('comments')->truncate();
+    }
+
+    /** @test */
+    public function it_restores_the_parent_the_child_and_the_grandchild_model_when_all_implementing_soft_delete()
+    {
+        $author = Tests\Entities\Author::create([
+            'name' => 'Testing child can be restored',
+        ]);
+
+        $this->attachPostsAndSoftDeleteCommentsToAuthor($author);
+
+        $author->delete();
+
+        $this->assertNull(Tests\Entities\Author::find($author->id));
+        $this->assertCount(1, Tests\Entities\Author::withTrashed()->where('id', $author->id)->get());
+        $this->assertCount(0, Tests\Entities\Post::where('author_id', $author->id)->get());
+
+        $deletedPosts = Tests\Entities\Post::withTrashed()->where('author_id', $author->id)->get();
+        $this->assertCount(2, $deletedPosts);
+
+        $author->restore();
+
+        $this->assertCount(1, Tests\Entities\Author::where('id', $author->id)->get());
+        $this->assertCount(2, Tests\Entities\Post::where('author_id', $author->id)->get());
+
+        foreach ($deletedPosts as $deletedPost) {
+            $this->assertCount(3, Tests\Entities\SoftDeleteComment::where('post_id', $deletedPost->id)->get());
+        }
+
+        Manager::table('authors')->truncate();
+        Manager::table('posts')->truncate();
+        Manager::table('comments')->truncate();
+    }
+
+    /** @test */
+    public function it_cannot_restore_parent_and_child_model_when_force_deleting_a_parent_model()
+    {
+        $post = Tests\Entities\Post::create([
+            'title' => 'How to cascade soft deletes in Laravel',
+            'body' => "It cannot restore parent model when force deleted the parent model",
+        ]);
+
+        $this->attachCommentsToPost($post);
+
+        $this->assertCount(3, $post->comments);
+        $post->forceDelete();
+        $post->restore();
+        $this->assertCount(0, Tests\Entities\Comment::where('post_id', $post->id)->get());
+        $this->assertCount(0, Tests\Entities\Post::withTrashed()->where('id', $post->id)->get());
+
+        Manager::table('posts')->truncate();
+        Manager::table('comments')->truncate();
     }
 
     /**
@@ -274,6 +493,25 @@ class CascadeSoftDeletesIntegrationTest extends TestCase
 
             Tests\Entities\PostType::create([
                 'label' => 'Second Post Type',
+            ]),
+        ]);
+    }
+
+    /**
+     * Attach some post types to the given author.
+     *
+     * @return void
+     */
+    public function attachHasSoftDeletesPivotsToAuthor($author)
+    {
+        $author->hassoftdeletespivots()->saveMany([
+
+            Tests\Entities\HasSoftDeletesPivot::create([
+                'label' => 'First Pivot',
+            ]),
+
+            Tests\Entities\HasSoftDeletesPivot::create([
+                'label' => 'Second Pivot',
             ]),
         ]);
     }
@@ -304,6 +542,52 @@ class CascadeSoftDeletesIntegrationTest extends TestCase
     }
 
     /**
+     * Attach some dummy posts (w/ comments) to the given author.
+     *
+     * @return void
+     */
+    private function attachPostsAndSoftDeleteCommentsToAuthor($author)
+    {
+        $author->posts()->saveMany([
+            $this->attachSoftDeleteCommentsToPost(
+                Tests\Entities\Post::create([
+                    'title' => 'First post',
+                    'body' => 'This is the first test post',
+                ])
+            ),
+            $this->attachSoftDeleteCommentsToPost(
+                Tests\Entities\Post::create([
+                    'title' => 'Second post',
+                    'body' => 'This is the second test post',
+                ])
+            ),
+        ]);
+
+        return $author;
+    }
+
+    /**
+     * Attach some dummy posts (w/ comments) to the given author.
+     *
+     * @return void
+     */
+    private function attachPostsToAuthor($author)
+    {
+        $author->posts()->saveMany([
+            Tests\Entities\Post::create([
+                'title' => 'First post',
+                'body' => 'This is the first test post',
+            ]),
+            Tests\Entities\Post::create([
+                'title' => 'Second post',
+                'body' => 'This is the second test post',
+            ])
+        ]);
+
+        return $author;
+    }
+
+    /**
      * Attach some dummy comments to the given post.
      *
      * @return void
@@ -318,4 +602,22 @@ class CascadeSoftDeletesIntegrationTest extends TestCase
 
         return $post;
     }
+
+    /**
+     * Attach some dummy comments to the given post.
+     *
+     * @return void
+     */
+    private function attachSoftDeleteCommentsToPost($post)
+    {
+        $post->softDeleteComments()->saveMany([
+            new Tests\Entities\SoftDeleteComment(['body' => 'This is the first test comment']),
+            new Tests\Entities\SoftDeleteComment(['body' => 'This is the second test comment']),
+            new Tests\Entities\SoftDeleteComment(['body' => 'This is the third test comment']),
+        ]);
+
+        return $post;
+    }
+
+
 }

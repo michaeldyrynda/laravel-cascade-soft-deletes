@@ -25,4 +25,9 @@ class Post extends Model
     {
         return $this->hasOne('Tests\Entities\PostType', 'post_id');
     }
+
+    public function softDeleteComments()
+    {
+        return $this->hasMany('Tests\Entities\SoftDeleteComment');
+    }
 }
