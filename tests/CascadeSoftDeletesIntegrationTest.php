@@ -102,8 +102,7 @@ class CascadeSoftDeletesIntegrationTest extends TestCase
         $post->delete();
         $this->assertCount(0, Tests\Entities\Comment::where('post_id', $post->id)->get());
 
-        Manager::table('posts')->truncate();
-        Manager::table('comments')->truncate();
+
     }
 
 
@@ -123,9 +122,7 @@ class CascadeSoftDeletesIntegrationTest extends TestCase
 
         $this->assertCount(0, $pivotEntries);
 
-        Manager::table('authors')->truncate();
-        Manager::table('post_types')->truncate();
-        Manager::table('authors__post_types')->truncate();
+
     }
 
     /** @test */
@@ -143,8 +140,7 @@ class CascadeSoftDeletesIntegrationTest extends TestCase
         $this->assertCount(0, Tests\Entities\Comment::where('post_id', $post->id)->get());
         $this->assertCount(0, Tests\Entities\Post::withTrashed()->where('id', $post->id)->get());
 
-        Manager::table('posts')->truncate();
-        Manager::table('comments')->truncate();
+
     }
 
     /**
@@ -217,8 +213,7 @@ class CascadeSoftDeletesIntegrationTest extends TestCase
         $this->assertCount(1, Tests\Entities\Post::withTrashed()->where('id', $post->id)->get());
         $this->assertCount(0, Tests\Entities\Comment::where('post_id', $post->id)->get());
 
-        Manager::table('posts')->truncate();
-        Manager::table('comments')->truncate();
+
     }
 
     /**
@@ -253,8 +248,7 @@ class CascadeSoftDeletesIntegrationTest extends TestCase
         $this->assertCount(1, Tests\Entities\ChildPost::withTrashed()->where('id', $post->id)->get());
         $this->assertCount(0, Tests\Entities\Comment::where('post_id', $post->id)->get());
 
-        Manager::table('posts')->truncate();
-        Manager::table('comments')->truncate();
+
     }
 
     /** @test */
@@ -278,9 +272,8 @@ class CascadeSoftDeletesIntegrationTest extends TestCase
         foreach ($deletedPosts as $deletedPost) {
             $this->assertCount(0, Tests\Entities\Comment::where('post_id', $deletedPost->id)->get());
         }
-        Manager::table('authors')->truncate();
-        Manager::table('posts')->truncate();
-        Manager::table('comments')->truncate();
+
+
     }
 
     /** @test */
@@ -298,8 +291,7 @@ class CascadeSoftDeletesIntegrationTest extends TestCase
         $post->delete();
         $this->assertCount(0, Tests\Entities\PostType::where('id', $type->id)->get());
 
-        Manager::table('posts')->truncate();
-        Manager::table('post_types')->truncate();
+
     }
 
     /** @test */
@@ -315,10 +307,9 @@ class CascadeSoftDeletesIntegrationTest extends TestCase
         $post->delete();
         $post->restore();
         $this->assertCount(0, Tests\Entities\Comment::where('post_id', $post->id)->get());
-        $this->assertCount(1, Tests\Entities\Post::get());
+        $this->assertCount(1, Tests\Entities\Post::where('id', $post->id)->get());
 
-        Manager::table('posts')->truncate();
-        Manager::table('comments')->truncate();
+
     }
 
     /** @test */
@@ -344,8 +335,7 @@ class CascadeSoftDeletesIntegrationTest extends TestCase
         $this->assertCount(1, Tests\Entities\Author::where('id', $author->id)->get());
         $this->assertCount(2, Tests\Entities\Post::where('author_id', $author->id)->get());
 
-        Manager::table('authors')->truncate();
-        Manager::table('posts')->truncate();
+
     }
 
     /** @test */
@@ -363,12 +353,10 @@ class CascadeSoftDeletesIntegrationTest extends TestCase
         $pivotEntries = Manager::table('authors__post_types')
             ->where('author_id', $author->id)
             ->get();
-        $this->assertCount(1, Tests\Entities\Author::get());
+        $this->assertCount(1, Tests\Entities\Author::where('id', $author->id)->get());
         $this->assertCount(0, $pivotEntries);
 
-        Manager::table('authors')->truncate();
-        Manager::table('post_types')->truncate();
-        Manager::table('authors__post_types')->truncate();
+
     }
 
     /** @test */
@@ -386,12 +374,10 @@ class CascadeSoftDeletesIntegrationTest extends TestCase
         $pivotEntries = Manager::table('authors__has_soft_deletes_pivots')
             ->where('author_id', $author->id)
             ->get();
-        $this->assertCount(1, Tests\Entities\Author::get());
+        $this->assertCount(1, Tests\Entities\Author::where('id', $author->id)->get());
         $this->assertCount(2, $pivotEntries);
 
-        Manager::table('authors')->truncate();
-        Manager::table('post_types')->truncate();
-        Manager::table('authors__post_types')->truncate();
+
     }
 
     /** @test */
@@ -421,9 +407,8 @@ class CascadeSoftDeletesIntegrationTest extends TestCase
             $this->assertCount(0, Tests\Entities\Comment::where('post_id', $deletedPost->id)->get());
         }
 
-        Manager::table('authors')->truncate();
-        Manager::table('posts')->truncate();
-        Manager::table('comments')->truncate();
+
+
     }
 
     /** @test */
@@ -453,9 +438,8 @@ class CascadeSoftDeletesIntegrationTest extends TestCase
             $this->assertCount(3, Tests\Entities\SoftDeleteComment::where('post_id', $deletedPost->id)->get());
         }
 
-        Manager::table('authors')->truncate();
-        Manager::table('posts')->truncate();
-        Manager::table('comments')->truncate();
+
+
     }
 
     /** @test */
@@ -474,8 +458,7 @@ class CascadeSoftDeletesIntegrationTest extends TestCase
         $this->assertCount(0, Tests\Entities\Comment::where('post_id', $post->id)->get());
         $this->assertCount(0, Tests\Entities\Post::withTrashed()->where('id', $post->id)->get());
 
-        Manager::table('posts')->truncate();
-        Manager::table('comments')->truncate();
+
     }
 
     /**
