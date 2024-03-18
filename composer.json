@@ -4,11 +4,8 @@
     "type": "utility",
     "require": {
         "php": "^8.1",
-        "illuminate/database": "^10.0",
-        "illuminate/events": "^10.0"
-    },
-    "require-dev": {
-        "phpunit/phpunit": "^9.6 || ^10.0"
+        "illuminate/database": "^10.0 || ^11.0",
+        "illuminate/events": "^10.0 || ^11.0"
     },
     "autoload": {
         "psr-4": {
@@ -33,6 +30,13 @@
     "config": {
         "extra": {
             "sort-packages": true
+        },
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
         }
+    },
+    "require-dev": {
+        "pestphp/pest": "^2.34",
+        "pestphp/pest-plugin-drift": "^2.5"
     }
 }
