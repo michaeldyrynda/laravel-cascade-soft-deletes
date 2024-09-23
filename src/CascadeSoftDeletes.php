@@ -65,8 +65,23 @@ trait CascadeSoftDeletes
     {
         $delete = $this->forceDeleting ? 'forceDelete' : 'delete';
 
-        foreach ($this->{$relationship}()->get() as $model) {
+        $cb = function($model) use ($delete) {
             isset($model->pivot) ? $model->pivot->{$delete}() : $model->{$delete}();
+        };
+
+        $this->handleRecords($relationship, $cb);
+    }
+
+    private function handleRecords($relationship, $cb)
+    {
+        $fetchMethod = $this->fetchMethod ?? 'get';
+
+        if ($fetchMethod == 'chunk') {
+            $this->{$relationship}()->chunk($this->chunkSize ?? 500, $cb);
+        } else {
+            foreach($this->{$relationship}()->$fetchMethod() as $model) {
+                $cb($model);
+            }
         }
     }
 
