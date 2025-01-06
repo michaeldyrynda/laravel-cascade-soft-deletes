@@ -1,5 +1,6 @@
 <?php
 
+use Carbon\Carbon;
 use Dyrynda\Database\Support\CascadeSoftDeleteException;
 use Illuminate\Container\Container;
 use Illuminate\Database\Capsule\Manager;
@@ -47,6 +48,7 @@ beforeAll(function () {
         $table->integer('post_id')->unsigned();
         $table->string('body');
         $table->timestamps();
+        $table->softDeletes();
     });
 
     $manager->schema()->create('post_types', function ($table) {
@@ -235,6 +237,55 @@ it('cascades a has one relationship', function () {
 
     expect(PostType::where('id', $type->id)->get())->toHaveCount(0);
 });
+
+
+it('cascades restores soft deleted children', function () {
+    $post = Post::create([
+        'title' => 'How to cascade restores in Laravel',
+        'body' => 'This is how you cascade restores in Laravel',
+    ]);
+
+    attachCommentsToPost($post);
+
+    expect($post->comments)->toHaveCount(3);
+
+    $post->delete();
+
+    expect(Comment::where('post_id', $post->id)->get())->toHaveCount(0);
+
+    $post->restore();
+
+    expect($post->comments)->toHaveCount(3);
+});
+
+it('does not cascade restore children deleted before the parent', function () {
+    $post = Post::create([
+        'title' => 'How to cascade restores in Laravel',
+        'body' => 'This is how you cascade restores in Laravel',
+    ]);
+
+    attachCommentsToPost($post);
+
+    expect($post->comments)->toHaveCount(3);
+
+    Carbon::setTestNow((new DateTime)->modify("-1 seconds"));
+
+    $post->comments()->take(1)->delete();
+
+    expect($post->refresh()->comments)->toHaveCount(2);
+
+    Carbon::setTestNow();
+
+    $post->delete();
+
+    expect(Comment::where('post_id', $post->id)->get())->toHaveCount(0);
+
+    $post->restore();
+
+    expect($post->refresh()->comments)->toHaveCount(2);
+});
+
+
 
 /**
  * Attach some post types to the given author.

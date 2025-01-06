@@ -22,6 +22,14 @@ trait CascadeSoftDeletes
 
             $model->runCascadingDeletes();
         });
+
+        if (method_exists(static::class, 'restoring')) {
+            static::restoring(function ($model) {
+                $model->validateCascadingSoftDelete();
+
+                $model->runCascadingRestores();
+            });
+        }
     }
 
 
@@ -67,6 +75,37 @@ trait CascadeSoftDeletes
 
         foreach ($this->{$relationship}()->get() as $model) {
             isset($model->pivot) ? $model->pivot->{$delete}() : $model->{$delete}();
+        }
+    }
+
+    /**
+     * Run the cascading restore for this model.
+     *
+     * @return void
+     */
+    protected function runCascadingRestores()
+    {
+        foreach ($this->getCascadingDeletes() as $relationship) {
+            $this->cascadeRestores($relationship);
+        }
+    }
+
+    /**
+     * Cascade restore the given relationship on the given mode.
+     *
+     * @param  string  $relationship
+     * @return return
+     */
+    protected function cascadeRestores($relationship)
+    {
+        if (method_exists($this->{$relationship}()->getModel(), 'runSoftDelete')) {
+            foreach ($this->{$relationship}()
+                ->withTrashed()
+                ->where('deleted_at', '>=', $this->{$this->getDeletedAtColumn()})
+                ->get() as $model
+            ) {
+                $model->restore();
+            }
         }
     }
 
