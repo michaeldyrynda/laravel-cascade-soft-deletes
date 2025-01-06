@@ -101,7 +101,7 @@ trait CascadeSoftDeletes
         if (method_exists($this->{$relationship}()->getModel(), 'runSoftDelete')) {
             foreach ($this->{$relationship}()
                 ->withTrashed()
-                ->where('deleted_at', '>=', $this->{$this->getDeletedAtColumn()})
+                ->where($this->{$relationship}()->getModel()->getDeletedAtColumn(), '>=', $this->{$this->getDeletedAtColumn()})
                 ->get() as $model
             ) {
                 $model->restore();
