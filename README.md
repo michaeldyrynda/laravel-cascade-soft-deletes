@@ -36,6 +36,9 @@ class Post extends Model
 
     protected $dates = ['deleted_at'];
 
+    protected $fetchMethod = 'get'; // get, cursor, lazy or chunk
+    // protected $chunkSize = 500;
+
     public function comments()
     {
         return $this->hasMany(Comment::class);
