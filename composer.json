@@ -37,6 +37,6 @@
   },
   "require-dev": {
     "pestphp/pest": "^2.34 || ^3.7",
-    "pestphp/pest-plugin-drift": "^2.5"
+    "pestphp/pest-plugin-drift": "^3.0"
   }
 }
