@@ -1,42 +1,42 @@
 {
-    "name": "dyrynda/laravel-cascade-soft-deletes",
-    "description": "Cascading deletes for Eloquent models that implement soft deletes",
-    "type": "utility",
-    "require": {
-        "php": "^8.1",
-        "illuminate/database": "^10.0 || ^11.0 || ^12.0",
-        "illuminate/events": "^10.0 || ^11.0 || ^12.0"
-    },
-    "autoload": {
-        "psr-4": {
-            "Dyrynda\\Database\\Support\\": "src/"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "Tests\\": "tests/"
-        }
-    },
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "Michael Dyrynda",
-            "email": "michael@dyrynda.com.au",
-            "homepage": "https://dyrynda.com.au"
-        }
-    ],
-    "minimum-stability": "dev",
-    "prefer-stable": true,
-    "config": {
-        "extra": {
-            "sort-packages": true
-        },
-        "allow-plugins": {
-            "pestphp/pest-plugin": true
-        }
-    },
-    "require-dev": {
-        "pestphp/pest": "^2.34 || ^3.7",
-        "pestphp/pest-plugin-drift": "^2.5"
+  "name": "dyrynda/laravel-cascade-soft-deletes",
+  "description": "Cascading deletes for Eloquent models that implement soft deletes",
+  "type": "utility",
+  "require": {
+    "php": "^8.2",
+    "illuminate/database": "^11.0 || ^12.0",
+    "illuminate/events": "^11.0 || ^12.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Dyrynda\\Database\\Support\\": "src/"
     }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Tests\\": "tests/"
+    }
+  },
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Michael Dyrynda",
+      "email": "michael@dyrynda.com.au",
+      "homepage": "https://dyrynda.com.au"
+    }
+  ],
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "config": {
+    "extra": {
+      "sort-packages": true
+    },
+    "allow-plugins": {
+      "pestphp/pest-plugin": true
+    }
+  },
+  "require-dev": {
+    "pestphp/pest": "^2.34 || ^3.7",
+    "pestphp/pest-plugin-drift": "^2.5"
+  }
 }
