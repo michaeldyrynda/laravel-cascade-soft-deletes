@@ -42,6 +42,7 @@
     },
     "scripts": {
         "check-style": "vendor/bin/pint --test",
-        "fix-style": "vendor/bin/pint"
+        "fix-style": "vendor/bin/pint",
+        "test": "vendor/bin/pest"
     }
 }
