@@ -12,7 +12,7 @@ In scenarios when you delete a parent record - say for example a blog post - you
 
 Normally, you would use your database's foreign key constraints, adding an `ON DELETE CASCADE` rule to the foreign key constraint in your comments table.
 
-It may be useful to be able to restore a parent record after it was deleted. In those instances, you may reach for Laravel's [soft deleting](https://laravel.com/docs/12.x/eloquent#soft-deleting) functionality.
+It may be useful to be able to restore a parent record after it was deleted. In those instances, you may reach for Laravel's [soft deleting](https://laravel.com/docs/13.x/eloquent#soft-deleting) functionality.
 
 In doing so, however, you lose the ability to use the cascading delete functionality that your database would otherwise provide. That is where this package aims to bridge the gap in functionality when using the `SoftDeletes` trait.
 
