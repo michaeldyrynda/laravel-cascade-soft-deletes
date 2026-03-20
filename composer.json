@@ -37,7 +37,6 @@
     },
     "require-dev": {
         "pestphp/pest": "^2.34 || ^3.7",
-        "pestphp/pest-plugin-drift": "^3.0",
         "laravel/pint": "^1.29"
     },
     "scripts": {
