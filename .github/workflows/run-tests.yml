@@ -7,6 +7,27 @@ on:
     - cron: '0 0 * * *'
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    name: Lint
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.5
+          coverage: none
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-interaction --no-progress
+
+      - name: Check style
+        run: composer check-style
+
   test:
     runs-on: ubuntu-latest
 
@@ -39,9 +60,6 @@ jobs:
         run: |
           composer require "illuminate/contracts=${{ matrix.laravel }}" --prefer-dist --no-interaction --no-update
           composer update --prefer-dist --no-interaction --no-progress
-
-      - name: Check style
-        run: composer check-style
 
       - name: Execute tests
         run: composer test
