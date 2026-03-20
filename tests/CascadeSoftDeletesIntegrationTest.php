@@ -15,13 +15,13 @@ use Tests\Entities\PostWithMissingRelationshipMethod;
 use Tests\Entities\PostWithStringCascade;
 
 beforeAll(function () {
-    $manager = new Manager();
+    $manager = new Manager;
     $manager->addConnection([
         'driver' => 'sqlite',
         'database' => ':memory:',
     ]);
 
-    $manager->setEventDispatcher(new Dispatcher(new Container()));
+    $manager->setEventDispatcher(new Dispatcher(new Container));
 
     $manager->setAsGlobal();
     $manager->bootEloquent();

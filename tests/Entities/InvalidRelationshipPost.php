@@ -2,13 +2,13 @@
 
 namespace Tests\Entities;
 
+use Dyrynda\Database\Support\CascadeSoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Dyrynda\Database\Support\CascadeSoftDeletes;
 
 class InvalidRelationshipPost extends Model
 {
-    use SoftDeletes, CascadeSoftDeletes;
+    use CascadeSoftDeletes, SoftDeletes;
 
     public $dates = ['deleted_at'];
 
@@ -23,13 +23,7 @@ class InvalidRelationshipPost extends Model
         return $this->hasMany('Tests\Entities\Comment', 'post_id');
     }
 
-    public function invalidRelationship()
-    {
-        return;
-    }
+    public function invalidRelationship() {}
 
-    public function anotherInvalidRelationship()
-    {
-        return;
-    }
+    public function anotherInvalidRelationship() {}
 }

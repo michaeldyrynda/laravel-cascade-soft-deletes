@@ -2,13 +2,13 @@
 
 namespace Tests\Entities;
 
+use Dyrynda\Database\Support\CascadeSoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Dyrynda\Database\Support\CascadeSoftDeletes;
 
 class PostWithStringCascade extends Model
 {
-    use SoftDeletes, CascadeSoftDeletes;
+    use CascadeSoftDeletes, SoftDeletes;
 
     public $dates = ['deleted_at'];
 
