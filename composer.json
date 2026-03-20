@@ -3,7 +3,7 @@
     "description": "Cascading deletes for Eloquent models that implement soft deletes",
     "type": "utility",
     "require": {
-        "php": "^8.2",
+        "php": "^8.3",
         "illuminate/database": "^11.0 || ^12.0 || ^13.0",
         "illuminate/events": "^11.0 || ^12.0 || ^13.0"
     },
@@ -37,6 +37,11 @@
     },
     "require-dev": {
         "pestphp/pest": "^2.34 || ^3.7",
-        "pestphp/pest-plugin-drift": "^3.0"
+        "pestphp/pest-plugin-drift": "^3.0",
+        "laravel/pint": "^1.29"
+    },
+    "scripts": {
+        "check-style": "vendor/bin/pint --test",
+        "fix-style": "vendor/bin/pint"
     }
 }

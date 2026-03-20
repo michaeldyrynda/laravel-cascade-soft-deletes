@@ -24,11 +24,10 @@ trait CascadeSoftDeletes
         });
     }
 
-
     /**
      * Validate that the calling model is correctly setup for cascading soft deletes.
      *
-     * @throws \Dyrynda\Database\Support\CascadeSoftDeleteException
+     * @throws CascadeSoftDeleteException
      */
     protected function validateCascadingSoftDelete()
     {
@@ -40,7 +39,6 @@ trait CascadeSoftDeletes
             throw CascadeSoftDeleteException::invalidRelationships($invalidCascadingRelationships);
         }
     }
-
 
     /**
      * Run the cascading soft delete for this model.
@@ -54,7 +52,6 @@ trait CascadeSoftDeletes
         }
     }
 
-
     /**
      * Cascade delete the given relationship on the given mode.
      *
@@ -65,7 +62,7 @@ trait CascadeSoftDeletes
     {
         $delete = $this->forceDeleting ? 'forceDelete' : 'delete';
 
-        $cb = function($model) use ($delete) {
+        $cb = function ($model) use ($delete) {
             isset($model->pivot) ? $model->pivot->{$delete}() : $model->{$delete}();
         };
 
@@ -79,12 +76,11 @@ trait CascadeSoftDeletes
         if ($fetchMethod == 'chunk') {
             $this->{$relationship}()->chunk($this->chunkSize ?? 500, $cb);
         } else {
-            foreach($this->{$relationship}()->$fetchMethod() as $model) {
+            foreach ($this->{$relationship}()->$fetchMethod() as $model) {
                 $cb($model);
             }
         }
     }
-
 
     /**
      * Determine if the current model implements soft deletes.
@@ -95,7 +91,6 @@ trait CascadeSoftDeletes
     {
         return method_exists($this, 'runSoftDelete');
     }
-
 
     /**
      * Determine if the current model has any invalid cascading relationships defined.
@@ -112,7 +107,6 @@ trait CascadeSoftDeletes
         });
     }
 
-
     /**
      * Fetch the defined cascading soft deletes for this model.
      *
@@ -122,7 +116,6 @@ trait CascadeSoftDeletes
     {
         return isset($this->cascadeDeletes) ? (array) $this->cascadeDeletes : [];
     }
-
 
     /**
      * For the cascading deletes defined on the model, return only those that are not null.
