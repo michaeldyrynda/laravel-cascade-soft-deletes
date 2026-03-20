@@ -5,12 +5,14 @@ use Illuminate\Container\Container;
 use Illuminate\Database\Capsule\Manager;
 use Illuminate\Events\Dispatcher;
 use Tests\Entities\Author;
+use Tests\Entities\AuthorWithChunkFetch;
 use Tests\Entities\ChildPost;
 use Tests\Entities\Comment;
 use Tests\Entities\InvalidRelationshipPost;
 use Tests\Entities\NonSoftDeletingPost;
 use Tests\Entities\Post;
 use Tests\Entities\PostType;
+use Tests\Entities\PostWithChunkFetch;
 use Tests\Entities\PostWithMissingRelationshipMethod;
 use Tests\Entities\PostWithStringCascade;
 
@@ -234,6 +236,74 @@ it('cascades a has one relationship', function () {
     $post->delete();
 
     expect(PostType::where('id', $type->id)->get())->toHaveCount(0);
+});
+
+it('cascades deletes when using chunk fetch method', function () {
+    $post = PostWithChunkFetch::create([
+        'title' => 'Testing chunk fetch method',
+        'body' => 'Ensure that chunk fetch method works correctly',
+    ]);
+
+    attachCommentsToPost($post);
+
+    expect($post->comments)->toHaveCount(3);
+
+    $post->delete();
+
+    expect(Comment::where('post_id', $post->id)->get())->toHaveCount(0);
+});
+
+it('cascades deletes when force deleting with chunk fetch method', function () {
+    $post = PostWithChunkFetch::create([
+        'title' => 'Testing chunk fetch method with force delete',
+        'body' => 'Ensure that chunk fetch method works with force delete',
+    ]);
+
+    attachCommentsToPost($post);
+
+    expect($post->comments)->toHaveCount(3);
+
+    $post->forceDelete();
+
+    expect(Comment::where('post_id', $post->id)->get())->toHaveCount(0);
+    expect(Post::withTrashed()->where('id', $post->id)->get())->toHaveCount(0);
+});
+
+it('cascades chunk deletes for has one relationship', function () {
+    $post = PostWithChunkFetch::create([
+        'title' => 'Testing chunk with has one',
+        'body' => 'Ensure that chunk fetch method works with has one relationships',
+    ]);
+
+    $type = new PostType(['label' => 'Chunk Test']);
+
+    $post->postType()->save($type);
+
+    $post->delete();
+
+    expect(PostType::where('id', $type->id)->get())->toHaveCount(0);
+});
+
+it('cascades chunk deletes through grandchildren', function () {
+    $author = AuthorWithChunkFetch::create([
+        'name' => 'Testing chunk grandchildren are deleted',
+    ]);
+
+    attachPostsAndCommentsToAuthor($author);
+
+    $author->delete();
+
+    expect(AuthorWithChunkFetch::find($author->id))->toBeNull();
+    expect(AuthorWithChunkFetch::withTrashed()->where('id', $author->id)->get())->toHaveCount(1);
+    expect(Post::where('author_id', $author->id)->get())->toHaveCount(0);
+
+    $deletedPosts = Post::withTrashed()->where('author_id', $author->id)->get();
+
+    expect($deletedPosts)->toHaveCount(2);
+
+    foreach ($deletedPosts as $deletedPost) {
+        expect(Comment::where('post_id', $deletedPost->id)->get())->toHaveCount(0);
+    }
 });
 
 /**

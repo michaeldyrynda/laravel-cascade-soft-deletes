@@ -74,7 +74,11 @@ trait CascadeSoftDeletes
         $fetchMethod = $this->fetchMethod ?? 'get';
 
         if ($fetchMethod == 'chunk') {
-            $this->{$relationship}()->chunk($this->chunkSize ?? 500, $cb);
+            $this->{$relationship}()->chunk($this->chunkSize ?? 500, function ($models) use ($cb) {
+                foreach ($models as $model) {
+                    $cb($model);
+                }
+            });
         } else {
             foreach ($this->{$relationship}()->$fetchMethod() as $model) {
                 $cb($model);
