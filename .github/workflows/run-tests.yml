@@ -40,5 +40,8 @@ jobs:
           composer require "illuminate/contracts=${{ matrix.laravel }}" --prefer-dist --no-interaction --no-update
           composer update --prefer-dist --no-interaction --no-progress
 
+      - name: Check style
+        run: composer check-style
+
       - name: Execute tests
         run: composer test
