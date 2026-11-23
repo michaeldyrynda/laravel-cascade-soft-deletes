@@ -6,6 +6,7 @@ use Illuminate\Database\Capsule\Manager;
 use Illuminate\Events\Dispatcher;
 use Tests\Entities\Author;
 use Tests\Entities\AuthorWithChunkFetch;
+use Tests\Entities\AuthorWithSmallChunkFetch;
 use Tests\Entities\ChildPost;
 use Tests\Entities\Comment;
 use Tests\Entities\InvalidRelationshipPost;
@@ -13,7 +14,9 @@ use Tests\Entities\NonSoftDeletingPost;
 use Tests\Entities\Post;
 use Tests\Entities\PostType;
 use Tests\Entities\PostWithChunkFetch;
+use Tests\Entities\PostWithLazyFetch;
 use Tests\Entities\PostWithMissingRelationshipMethod;
+use Tests\Entities\PostWithSmallChunkFetch;
 use Tests\Entities\PostWithStringCascade;
 
 beforeAll(function () {
@@ -304,6 +307,73 @@ it('cascades chunk deletes through grandchildren', function () {
     foreach ($deletedPosts as $deletedPost) {
         expect(Comment::where('post_id', $deletedPost->id)->get())->toHaveCount(0);
     }
+});
+
+it('cascades chunk deletes across multiple chunks', function () {
+    $post = PostWithSmallChunkFetch::create([
+        'title' => 'Testing chunk deletes span multiple chunks',
+        'body' => 'Ensure deleting rows mid-chunk does not skip the following chunk',
+    ]);
+
+    attachCommentsToPost($post);
+
+    expect($post->comments)->toHaveCount(3);
+
+    $post->delete();
+
+    expect(Comment::where('post_id', $post->id)->get())->toHaveCount(0);
+});
+
+it('cascades force deletes across multiple chunks', function () {
+    $post = PostWithSmallChunkFetch::create([
+        'title' => 'Testing chunk force deletes span multiple chunks',
+        'body' => 'Ensure force deleting rows mid-chunk does not skip the following chunk',
+    ]);
+
+    attachCommentsToPost($post);
+
+    $post->forceDelete();
+
+    expect(Comment::where('post_id', $post->id)->get())->toHaveCount(0);
+});
+
+it('cascades chunk deletes to soft deleting children and pivots across multiple chunks', function () {
+    $author = AuthorWithSmallChunkFetch::create([
+        'name' => 'Testing soft deleting children span multiple chunks',
+    ]);
+
+    attachPostsAndCommentsToAuthor($author);
+    attachPostTypesToAuthor($author);
+
+    $author->delete();
+
+    expect(Post::where('author_id', $author->id)->get())->toHaveCount(0);
+    expect(Post::withTrashed()->where('author_id', $author->id)->get())->toHaveCount(2);
+    expect(Manager::table('authors__post_types')->where('author_id', $author->id)->get())->toHaveCount(0);
+});
+
+it('cascades lazy deletes across multiple chunks', function () {
+    $post = PostWithLazyFetch::create([
+        'title' => 'Testing lazy deletes span multiple chunks',
+        'body' => 'Ensure deleting rows while lazily iterating does not skip rows',
+    ]);
+
+    // lazy() fetches 1000 rows per query, so 1001 rows forces a second query.
+    $now = date('Y-m-d H:i:s');
+    $rows = array_map(fn ($i) => [
+        'post_id' => $post->id,
+        'body' => "Comment {$i}",
+        'created_at' => $now,
+        'updated_at' => $now,
+    ], range(1, 1001));
+
+    foreach (array_chunk($rows, 200) as $chunk) {
+        Manager::table('comments')->insert($chunk);
+    }
+
+    $post->delete();
+
+    expect(Comment::where('post_id', $post->id)->count())->toBe(0);
 });
 
 /**

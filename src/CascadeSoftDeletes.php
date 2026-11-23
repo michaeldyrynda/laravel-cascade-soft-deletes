@@ -73,8 +73,14 @@ trait CascadeSoftDeletes
     {
         $fetchMethod = $this->fetchMethod ?? 'get';
 
+        // Records are deleted while being iterated, so offset-based paging (chunk/lazy)
+        // would skip rows. Page by primary key instead, which is safe to delete under.
+        if ($fetchMethod == 'lazy') {
+            $fetchMethod = 'lazyById';
+        }
+
         if ($fetchMethod == 'chunk') {
-            $this->{$relationship}()->chunk($this->chunkSize ?? 500, function ($models) use ($cb) {
+            $this->{$relationship}()->chunkById($this->chunkSize ?? 500, function ($models) use ($cb) {
                 foreach ($models as $model) {
                     $cb($model);
                 }
